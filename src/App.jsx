@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import LoginModal from './components/LoginModal';
+import Home from './pages/Home';
+import StreamerPage from './pages/StreamerPage';
+import ViewerPage from './pages/ViewerPage';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Fake login con roles
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (email === 'streamer@streamoria.com' && password === '1234') {
+      setRole('streamer');
+      setIsLoggedIn(true);
+      setShowLogin(false);
+    } else if (email === 'viewer@streamoria.com' && password === '1234') {
+      setRole('viewer');
+      setIsLoggedIn(true);
+      setShowLogin(false);
+    } else {
+      alert('Credenciales incorrectas');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setEmail('');
+    setPassword('');
+    setRole(null);
+  };
+
+  // Render según el rol
+  let content;
+  if (!isLoggedIn) {
+    content = <Home />;
+  } else if (role === 'streamer') {
+    content = <StreamerPage />;
+  } else if (role === 'viewer') {
+    content = <ViewerPage />;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app-container">
+      <Header
+        isLoggedIn={isLoggedIn}
+        onLoginClick={() => setShowLogin(true)}
+        onLogoutClick={handleLogout}
+      />
 
-export default App
+      <main className="main">{content}</main>
+
+      <Footer />
+
+      {showLogin && (
+        <LoginModal
+          email={email}
+          password={password}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          onSubmit={handleLogin}
+          onClose={() => setShowLogin(false)}
+        />
+      )}
+    </div>
+  );
+}

@@ -1,42 +1,149 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Layout general */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #18181b;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  color: #bf94ff;
+  font-size: 1.5rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.nav a {
+  margin: 0 1rem;
+  font-size: 1rem;
+}
+
+.login-btn,
+.logout-btn {
+  background-color: #9146ff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* Hero section */
+.hero {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.hero h2 {
+  font-size: 2rem;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: #cfcfcf;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #18181b;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #1f1f23;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-content h2 {
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 0.6rem;
+  margin: 0.4rem 0;
+  border-radius: 4px;
+  border: 1px solid #333;
+  background: #0e0e10;
+  color: white;
+}
+
+.submit-btn,
+.close-btn {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.6rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.submit-btn {
+  background-color: #9146ff;
+  color: white;
+}
+
+.close-btn {
+  background-color: #3b3b44;
+  color: white;
+}
+
+/* Áreas privadas */
+.private-area {
+  text-align: center;
+  margin: 3rem 1rem;
+}
+
+.private-area h2 {
+  color: #bf94ff;
+}
+
+/* Responsive para portrait móvil */
+@media (max-width: 600px) and (orientation: portrait) {
+  .hero h2 {
+    font-size: 1.5rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .hero p {
+    font-size: 1rem;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .logo {
+    font-size: 1.2rem;
   }
-}
 
-.card {
-  padding: 2em;
-}
+  .nav a {
+    font-size: 0.9rem;
+  }
 
-.read-the-docs {
-  color: #888;
+  .login-btn,
+  .logout-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
 }
