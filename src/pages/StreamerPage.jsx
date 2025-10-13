@@ -1,9 +1,8 @@
-export default function ViewerPage() {
+export default function StreamerPage() {
   return (
-    <section className="private-area">
-      <h2>Área privada: Espectador</h2>
-      <p>Explora streams en vivo, chatea con streamers y guarda tus favoritos.</p>
+    <section className="page">
+      <h2>Panel del Streamer</h2>
+      <p>Aquí podrás gestionar tus transmisiones y estadísticas.</p>
     </section>
   );
 }
-

@@ -1,8 +1,8 @@
 export default function Home() {
   return (
-    <section className="hero">
-      <h2>Tu plataforma de streaming favorita</h2>
-      <p>Transmite, mira y comparte momentos únicos en Streamoria.</p>
+    <section className="home">
+      <h2>Bienvenido a Streamoria</h2>
+      <p>Transmite, mira y conecta con tu comunidad favorita.</p>
     </section>
   );
 }

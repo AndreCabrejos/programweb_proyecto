@@ -1,39 +1,36 @@
-export default function LoginModal({
-  email,
-  password,
-  onEmailChange,
-  onPasswordChange,
-  onSubmit,
-  onClose
-}) {
+import { useState } from 'react';
+
+export default function LoginModal({ onClose, onLogin }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onLogin(email, password);
+  };
+
   return (
-    <div className="modal" role="dialog" aria-modal="true">
-      <div className="modal-content">
+    <div className="modal-overlay">
+      <div className="modal">
         <h2>Iniciar sesión</h2>
-        <form onSubmit={onSubmit}>
-          <label htmlFor="email">Correo electrónico:</label>
+        <form onSubmit={handleSubmit}>
           <input
             type="email"
-            id="email"
+            placeholder="Correo electrónico"
             value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-
-          <label htmlFor="password">Contraseña:</label>
           <input
             type="password"
-            id="password"
+            placeholder="Contraseña"
             value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
-
-          <button type="submit" className="submit-btn">
-            Entrar
-          </button>
-          <button type="button" className="close-btn" onClick={onClose}>
-            Cerrar
+          <button type="submit">Entrar</button>
+          <button type="button" onClick={onClose}>
+            Cancelar
           </button>
         </form>
       </div>

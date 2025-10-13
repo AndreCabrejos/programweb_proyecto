@@ -1,30 +1,31 @@
 import { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginModal from './components/LoginModal';
 import Home from './pages/Home';
+import Nosotros from './pages/Nosotros';
+import TyC from './pages/TyC';
 import StreamerPage from './pages/StreamerPage';
 import ViewerPage from './pages/ViewerPage';
-import './App.css';
 
 export default function App() {
-  const [showLogin, setShowLogin] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
 
-  // Fake login con roles
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const handleLogin = (email, password) => {
     if (email === 'streamer@streamoria.com' && password === '1234') {
-      setRole('streamer');
       setIsLoggedIn(true);
+      setUserRole('streamer');
       setShowLogin(false);
+      navigate('/streamer');
     } else if (email === 'viewer@streamoria.com' && password === '1234') {
-      setRole('viewer');
       setIsLoggedIn(true);
+      setUserRole('viewer');
       setShowLogin(false);
+      navigate('/viewer');
     } else {
       alert('Credenciales incorrectas');
     }
@@ -32,43 +33,35 @@ export default function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setEmail('');
-    setPassword('');
-    setRole(null);
+    setUserRole(null);
+    navigate('/');
   };
 
-  // Render según el rol
-  let content;
-  if (!isLoggedIn) {
-    content = <Home />;
-  } else if (role === 'streamer') {
-    content = <StreamerPage />;
-  } else if (role === 'viewer') {
-    content = <ViewerPage />;
-  }
-
   return (
-    <div className="app-container">
+    <>
       <Header
         isLoggedIn={isLoggedIn}
         onLoginClick={() => setShowLogin(true)}
         onLogoutClick={handleLogout}
       />
 
-      <main className="main">{content}</main>
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/nosotros" element={<Nosotros />} />
+          <Route path="/tyc" element={<TyC />} />
+          {isLoggedIn && userRole === 'streamer' && (
+            <Route path="/streamer" element={<StreamerPage />} />
+          )}
+          {isLoggedIn && userRole === 'viewer' && (
+            <Route path="/viewer" element={<ViewerPage />} />
+          )}
+        </Routes>
+      </main>
 
       <Footer />
 
-      {showLogin && (
-        <LoginModal
-          email={email}
-          password={password}
-          onEmailChange={setEmail}
-          onPasswordChange={setPassword}
-          onSubmit={handleLogin}
-          onClose={() => setShowLogin(false)}
-        />
-      )}
-    </div>
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />}
+    </>
   );
 }

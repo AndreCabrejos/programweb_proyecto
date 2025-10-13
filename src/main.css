@@ -1,15 +1,26 @@
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #0e0e10;
-  color: #f1f1f1;
-}
+@media (max-width: 600px) and (orientation: portrait) {
+  header, footer, main, section {
+    padding: 1rem;
+  }
 
-a {
-  color: #bf94ff;
-  text-decoration: none;
-}
+  nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-button {
-  cursor: pointer;
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .modal {
+    width: 90%;
+  }
 }

@@ -1,18 +1,17 @@
+import { Link } from 'react-router-dom';
+
 export default function Header({ isLoggedIn, onLoginClick, onLogoutClick }) {
   return (
     <header className="header">
       <h1 className="logo">Streamoria</h1>
-      <nav className="nav">
-        <a href="#nosotros">Nosotros</a>
-        <a href="#tyc">TyC</a>
-        {isLoggedIn ? (
-          <button onClick={onLogoutClick} className="logout-btn">
-            Cerrar sesión
-          </button>
+      <nav>
+        <Link to="/">Inicio</Link>
+        <Link to="/nosotros">Nosotros</Link>
+        <Link to="/tyc">TyC</Link>
+        {!isLoggedIn ? (
+          <button onClick={onLoginClick}>Iniciar sesión</button>
         ) : (
-          <button onClick={onLoginClick} className="login-btn">
-            Iniciar sesión
-          </button>
+          <button onClick={onLogoutClick}>Cerrar sesión</button>
         )}
       </nav>
     </header>
