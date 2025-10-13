@@ -1,35 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import LoginModal from './components/LoginModal';
+import Home from './pages/Home';
+import Nosotros from './pages/Nosotros';
+import TyC from './pages/TyC';
+import StreamerPage from './pages/StreamerPage';
+import ViewerPage from './pages/ViewerPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  const handleLogin = (email, password) => {
+    if (email === 'streamer@streamoria.com' && password === '1234') {
+      setIsLoggedIn(true);
+      setUserRole('streamer');
+      setShowLogin(false);
+      navigate('/streamer');
+    } else if (email === 'viewer@streamoria.com' && password === '1234') {
+      setIsLoggedIn(true);
+      setUserRole('viewer');
+      setShowLogin(false);
+      navigate('/viewer');
+    } else {
+      alert('Credenciales incorrectas');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserRole(null);
+    navigate('/');
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <Header
+        isLoggedIn={isLoggedIn}
+        onLoginClick={() => setShowLogin(true)}
+        onLogoutClick={handleLogout}
+      />
 
-export default App
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/nosotros" element={<Nosotros />} />
+          <Route path="/tyc" element={<TyC />} />
+          {isLoggedIn && userRole === 'streamer' && (
+            <Route path="/streamer" element={<StreamerPage />} />
+          )}
+          {isLoggedIn && userRole === 'viewer' && (
+            <Route path="/viewer" element={<ViewerPage />} />
+          )}
+        </Routes>
+      </main>
+
+      <Footer />
+
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />}
+    </>
+  );
+}
