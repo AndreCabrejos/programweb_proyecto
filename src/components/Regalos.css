@@ -1,0 +1,52 @@
+.regalos-container {
+    background-color: #1e1e1e;
+    color: white;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.lista-regalos {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.regalo {
+    background-color: #2c2c2c;
+    padding: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100px;
+}
+
+.regalo:hover {
+    background-color: #3d3d3d;
+    transform: scale(1.05);
+}
+
+.regalo.seleccionado {
+    border: 2px solid #ffd700;
+}
+
+.icono {
+    font-size: 2rem;
+}
+
+.btn-enviar {
+    background-color: #ffd700;
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-enviar:hover {
+    background-color: #e6c200;
+}

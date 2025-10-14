@@ -9,6 +9,7 @@ import TyC from './pages/TyC';
 import StreamerPage from './pages/StreamerPage';
 import ViewerPage from './pages/ViewerPage';
 import ComprarMonedas from './pages/ComprarMonedas';
+import Regalos from "./components/Regalos";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -64,8 +65,12 @@ export default function App() {
             <Route path="/streamer" element={<StreamerPage />} />
           )}
           {isLoggedIn && userRole === 'viewer' && (
-            <Route path="/viewer" element={<ViewerPage />} />
+            <Route
+              path="/viewer"
+              element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
+            />
           )}
+
         </Routes>
       </main>
 
