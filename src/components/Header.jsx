@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Header({ isLoggedIn, onLoginClick, onLogoutClick }) {
+
+export default function Header({ isLoggedIn, onLoginClick, onLogoutClick, monedas }) {
+  const navigate = useNavigate();
+
   return (
     <header className="header">
       <h1 className="logo">Streamoria</h1>
@@ -8,6 +11,13 @@ export default function Header({ isLoggedIn, onLoginClick, onLogoutClick }) {
         <Link to="/">Inicio</Link>
         <Link to="/nosotros">Nosotros</Link>
         <Link to="/tyc">TyC</Link>
+
+        {isLoggedIn && (
+          <span className="coin-display" onClick={() => navigate('/comprar')}>
+            💰 {monedas} monedas
+          </span>
+        )}
+
         {!isLoggedIn ? (
           <button onClick={onLoginClick}>Iniciar sesión</button>
         ) : (

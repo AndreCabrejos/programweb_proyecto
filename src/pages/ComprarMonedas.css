@@ -1,0 +1,26 @@
+.comprar-monedas {
+    text-align: center;
+    padding: 2rem;
+}
+
+.comprar-monedas input {
+    margin: 1rem;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: none;
+    width: 120px;
+    text-align: center;
+}
+
+.comprar-monedas button {
+    background-color: #b47cff;
+    border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.comprar-monedas button:hover {
+    opacity: 0.9;
+}

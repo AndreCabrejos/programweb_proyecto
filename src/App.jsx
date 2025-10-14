@@ -8,11 +8,13 @@ import Nosotros from './pages/Nosotros';
 import TyC from './pages/TyC';
 import StreamerPage from './pages/StreamerPage';
 import ViewerPage from './pages/ViewerPage';
+import ComprarMonedas from './pages/ComprarMonedas';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [monedas, setMonedas] = useState(100);
   const navigate = useNavigate();
 
   const handleLogin = (email, password) => {
@@ -37,12 +39,18 @@ export default function App() {
     navigate('/');
   };
 
+  // 🪙 función para sumar monedas
+  const manejarCompraMonedas = (cantidad) => {
+    setMonedas(monedas + cantidad);
+  };
+
   return (
     <>
       <Header
         isLoggedIn={isLoggedIn}
         onLoginClick={() => setShowLogin(true)}
         onLogoutClick={handleLogout}
+        monedas={monedas}
       />
 
       <main>
@@ -50,6 +58,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/tyc" element={<TyC />} />
+          <Route path="/comprar" element={<ComprarMonedas onBuy={manejarCompraMonedas} />} />
+
           {isLoggedIn && userRole === 'streamer' && (
             <Route path="/streamer" element={<StreamerPage />} />
           )}
