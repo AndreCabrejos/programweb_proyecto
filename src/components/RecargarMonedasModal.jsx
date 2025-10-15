@@ -1,10 +1,9 @@
-import React, { useState, useContext } from "react";
-import { UserContext } from "../context/UserContext";
+import React, { useState } from "react";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable"; // ✅ Import correcto
 import "./RecargarMonedasModal.css";
 
-export default function RecargarMonedasModal({ onClose }) {
-  const { saldo, setSaldo } = useContext(UserContext);
+export default function RecargarMonedasModal({ monedas, setMonedas, onClose }) {
   const [monto, setMonto] = useState("");
   const [tarjeta, setTarjeta] = useState("");
   const [caducidad, setCaducidad] = useState("");
@@ -29,24 +28,51 @@ export default function RecargarMonedasModal({ onClose }) {
         fecha: new Date().toLocaleString(),
       };
       setTransaccion(nueva);
-      setSaldo((prev) => prev + nueva.monto);
+      setMonedas((prev) => prev + nueva.monto);
       setCargando(false);
     }, 2000); // Simula una demora de 2 segundos
   };
 
   const generarComprobante = () => {
     const doc = new jsPDF();
-    doc.text("Comprobante de Recarga", 10, 10);
-    doc.text(`ID Transacción: ${transaccion.id}`, 10, 20);
-    doc.text(`Monto: S/. ${transaccion.monto}`, 10, 30);
-    doc.text(`Fecha: ${transaccion.fecha}`, 10, 40);
+    const fecha = new Date().toLocaleString();
+
+    // Encabezado
+    doc.setFontSize(18);
+    doc.text("Comprobante de Recarga", 60, 20);
+    doc.setFontSize(12);
+    doc.text(`ID Transacción: ${transaccion.id}`, 14, 35);
+    doc.text(`Fecha: ${fecha}`, 14, 42);
+
+    // Tabla con datos de la recarga
+    autoTable(doc, {
+      startY: 55,
+      head: [["Detalle", "Valor"]],
+      body: [
+        ["Monto Recargado", `S/. ${transaccion.monto.toFixed(2)}`],
+        ["Saldo Actual", `S/. ${(monedas + transaccion.monto).toFixed(2)}`],
+      ],
+      styles: { fontSize: 11 },
+      headStyles: { fillColor: [22, 160, 133], textColor: 255 },
+    });
+
+    // Mensaje de cierre
+    doc.text(
+      "Gracias por su recarga. ¡Siga disfrutando de nuestros servicios!",
+      14,
+      doc.lastAutoTable.finalY + 10
+    );
+
+    // Guardar archivo
     doc.save(`comprobante_${transaccion.id}.pdf`);
   };
 
   return (
     <div className="modal-overlay">
       <div className="payment-modal">
-        <button className="close-btn" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={onClose}>
+          ×
+        </button>
 
         {cargando ? (
           <div className="loading-container">
@@ -108,7 +134,11 @@ export default function RecargarMonedasModal({ onClose }) {
                 </div>
 
                 <div className="button-row">
-                  <button type="button" className="cancel-btn" onClick={onClose}>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={onClose}
+                  >
                     CANCELAR
                   </button>
                   <button type="submit" className="pay-btn">
@@ -136,9 +166,15 @@ export default function RecargarMonedasModal({ onClose }) {
         ) : (
           <div className="recargar-result">
             <h3>¡Recarga Exitosa!</h3>
-            <p><strong>ID:</strong> {transaccion.id}</p>
-            <p><strong>Monto:</strong> S/. {transaccion.monto}</p>
-            <p><strong>Fecha:</strong> {transaccion.fecha}</p>
+            <p>
+              <strong>ID:</strong> {transaccion.id}
+            </p>
+            <p>
+              <strong>Monto:</strong> S/. {transaccion.monto}
+            </p>
+            <p>
+              <strong>Fecha:</strong> {transaccion.fecha}
+            </p>
             <button className="pay-btn" onClick={generarComprobante}>
               Descargar Comprobante (PDF)
             </button>
