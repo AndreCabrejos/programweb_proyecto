@@ -11,12 +11,13 @@ import ViewerPage from "./pages/ViewerPage";
 import RegisterPage from "./pages/RegisterPage"; // ✅ Ruta de Crear Cuenta
 import ComprarMonedas from './pages/ComprarMonedas'; // ✅ Ruta de Compra de Monedas
 import PerfilPage from "./pages/PerfilPage"; // 👈 import nuevo
-
+import RecargarMonedas from './components/RecargarMonedasModal';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [showRecargarModal, setShowRecargarModal] = useState(false);
   // Estado de monedas centralizado
   const [monedas, setMonedas] = useState(100); 
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export default function App() {
       setUserRole("viewer");
       setShowLogin(false);
 
-      navigate('/'); // 👈 te lleva al Home (donde estarán los canales recomendados)
+      navigate('/');
 
     } else {
       // Usamos console.error en lugar de alert()
@@ -55,9 +56,11 @@ export default function App() {
     <>
       <Header
         isLoggedIn={isLoggedIn}
+        userRole={userRole} 
         onLoginClick={() => setShowLogin(true)}
         onLogoutClick={handleLogout}
         monedas={monedas}
+        onRecargarClick={() => setShowRecargarModal(true)} 
       />
 
       <main>
@@ -75,13 +78,14 @@ export default function App() {
             <Route path="/streamer" element={<StreamerPage />} />
           )}
           {isLoggedIn && userRole === 'viewer' && (
+            <>
             <Route
               path="/viewer/:canal"
               element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
             />
+             <Route path="/recargar" element={<RecargarMonedas />} />
+             </>
           )}
-
-
         </Routes>
       </main>
 
@@ -89,6 +93,14 @@ export default function App() {
 
       {showLogin && (
         <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />
+      )}
+
+      {showRecargarModal && (
+        <RecargarMonedas 
+          monedas={monedas} 
+          setMonedas={setMonedas} 
+          onClose={() => setShowRecargarModal(false)} 
+        />
       )}
     </>
   );
