@@ -28,7 +28,7 @@ export default function App() {
       setIsLoggedIn(true);
       setUserRole('viewer');
       setShowLogin(false);
-      navigate('/viewer');
+      navigate('/'); // 👈 te lleva al Home (donde estarán los canales recomendados)
     } else {
       alert('Credenciales incorrectas');
     }
@@ -66,10 +66,11 @@ export default function App() {
           )}
           {isLoggedIn && userRole === 'viewer' && (
             <Route
-              path="/viewer"
+              path="/viewer/:canal"
               element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
             />
           )}
+
 
         </Routes>
       </main>

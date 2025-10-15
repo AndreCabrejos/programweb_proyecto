@@ -1,5 +1,9 @@
 @media (max-width: 600px) and (orientation: portrait) {
-  header, footer, main, section {
+
+  header,
+  footer,
+  main,
+  section {
     padding: 1rem;
   }
 
