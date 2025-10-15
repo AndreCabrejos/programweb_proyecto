@@ -10,6 +10,8 @@ import StreamerPage from "./pages/StreamerPage";
 import ViewerPage from "./pages/ViewerPage";
 import RegisterPage from "./pages/RegisterPage"; // ✅ Ruta de Crear Cuenta
 import ComprarMonedas from './pages/ComprarMonedas'; // ✅ Ruta de Compra de Monedas
+import PerfilPage from "./pages/PerfilPage"; // 👈 import nuevo
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,7 +31,9 @@ export default function App() {
       setIsLoggedIn(true);
       setUserRole("viewer");
       setShowLogin(false);
-      navigate("/viewer");
+
+      navigate('/'); // 👈 te lleva al Home (donde estarán los canales recomendados)
+
     } else {
       // Usamos console.error en lugar de alert()
       console.error("Credenciales incorrectas");
@@ -58,6 +62,7 @@ export default function App() {
 
       <main>
         <Routes>
+          <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/" element={<Home />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/tyc" element={<TyC />} />
@@ -71,10 +76,11 @@ export default function App() {
           )}
           {isLoggedIn && userRole === 'viewer' && (
             <Route
-              path="/viewer"
+              path="/viewer/:canal"
               element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
             />
           )}
+
 
         </Routes>
       </main>

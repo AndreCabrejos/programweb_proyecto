@@ -1,8 +1,19 @@
+import CanalesRecomendados from "../components/CanalesRecomendados";
+import "./Home.css";
+
 export default function Home() {
   return (
-    <section className="home">
-      <h2>Bienvenido a Streamoria</h2>
-      <p>Transmite, mira y conecta con tu comunidad favorita.</p>
-    </section>  
+
+    <div className="home-layout">
+      <aside className="canales-sidebar">
+        <CanalesRecomendados />
+      </aside>
+
+      <section className="home-content">
+        <h2>Bienvenido a Streamoria</h2>
+        <p>Explora canales en vivo y descubre nuevos creadores.</p>
+      </section>
+    </div>
+
   );
 }

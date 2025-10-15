@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
-// Importamos Regalos (asumiendo que está en components/)
-import Regalos from "../components/Regalos"; 
+
+import React, { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import CanalesRecomendados from "../components/CanalesRecomendados";
+import Regalos from "../components/Regalos";
+import mensajesData from "../data/mensajes.json";
+
 import "./ViewerPage.css";
 
-// ----------------------------------------------------
-// Componente de la Tarjeta de Perfil/Puntos (Tu Avance)
-// ----------------------------------------------------
-// Recibe 'coins' como prop desde App.jsx
+
 const ViewerProfileCard = ({ coins }) => {
     const [viewerData, setViewerData] = useState({
         nombre: "André",
@@ -72,34 +73,112 @@ const ViewerProfileCard = ({ coins }) => {
 
 // Componente principal que fusiona el Stream con el Chat/Sidebar
 export default function ViewerPage({ monedas, setMonedas }) {
-  // Función para enviar regalos (MANTENIDA del código base)
+
+
+  const { canal } = useParams();
+  const [mostrarRegalos, setMostrarRegalos] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+  const [puntos, setPuntos] = useState(0);
+  const [mensajes, setMensajes] = useState(mensajesData);
+
+  const mensajesRef = useRef(null);
+
+  // 🔹 Desplazar automáticamente hacia el final
+  useEffect(() => {
+    if (mensajesRef.current) {
+      mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
+    }
+  }, [mensajes]);
+
   const handleEnviarRegalo = (regalo) => {
-    // Asegura que tienes suficientes monedas antes de gastar
-    if (monedas >= regalo.costo) {
-        setMonedas((prev) => prev - regalo.costo);
-        console.log(`Regalo enviado: ${regalo.nombre}`);
-    } else {
-        console.error("No tienes suficientes monedas para este regalo.");
+    setMonedas((prev) => prev - regalo.costo);
+    setPuntos((prev) => prev + (regalo.puntos || 0));
+  };
+
+  const handleEnviarMensaje = (e) => {
+    e.preventDefault();
+    if (mensaje.trim() !== "") {
+      const nuevoMensaje = {
+        id: mensajes.length + 1,
+        usuario: "Tú",
+        texto: mensaje,
+      };
+      setMensajes([...mensajes, nuevoMensaje]);
+      setMensaje("");
+      setPuntos((prev) => prev + 1); // +1 punto por mensaje
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleEnviarMensaje(e);
+
     }
   };
 
   return (
-    <div className="viewer-page">
-      <div className="stream-container">
-        <h1>🎥 Transmisión en vivo</h1>
-        {/* Aquí iría el reproductor de video del stream */}
-        <p>Contenido del Stream simulado...</p>
-      </div>
 
-      <aside className="sidebar-chat">
-        {/* Tu Tarjeta de Perfil/Puntos integrada y conectada al estado central de monedas */}
-        <ViewerProfileCard coins={monedas} />
+    <div className="viewer-layout">
+      <aside className="viewer-canales">
+        <CanalesRecomendados />
+      </aside>
 
-        {/* Separador visual */}
-        <hr className="divider" style={{ width: '80%', margin: '20px 0' }}/>
-        
-        {/* Componente de Regalos (de tu compañero) */}
-        <Regalos monedas={monedas} onEnviarRegalo={handleEnviarRegalo} />
+      <main className="viewer-stream">
+        <div className="stream-video">
+          🎥 Transmisión en vivo de <strong>{canal}</strong>
+        </div>
+        <div className="stream-info">
+          <img src={`/images/${canal}.jpg`} alt={canal} className="stream-logo" />
+          <div className="stream-detalle">
+            <h2>{canal}</h2>
+            <p className="stream-categoria">Categoría: Just Chatting</p>
+          </div>
+        </div>
+      </main>
+
+      <aside className="viewer-chat">
+        <div className="chat-box">
+          <div className="chat-mensajes" ref={mensajesRef}>
+            {mensajes.map((m) => (
+              <p key={m.id}>
+                <strong>{m.usuario}:</strong> {m.texto}
+              </p>
+            ))}
+          </div>
+        </div>
+
+        <form className="chat-input" onSubmit={handleEnviarMensaje}>
+          <textarea
+            value={mensaje}
+            onChange={(e) => setMensaje(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Enviar un mensaje..."
+          />
+          <button type="submit">➤</button>
+        </form>
+
+        <div className="chat-footer">
+          <div className="puntos">
+            <img src="/images/puntos.png" alt="puntos" className="icono-puntos" />
+            <span>{puntos}</span>
+          </div>
+          <button
+            className="btn-tienda"
+            onClick={() => setMostrarRegalos(!mostrarRegalos)}
+          >
+            🏪
+          </button>
+        </div>
+
+        {mostrarRegalos && (
+          <Regalos
+            monedas={monedas}
+            onEnviarRegalo={handleEnviarRegalo}
+            onClose={() => setMostrarRegalos(false)}
+          />
+        )}
+
       </aside>
     </div>
   );

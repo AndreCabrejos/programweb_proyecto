@@ -1,249 +1,225 @@
-.viewer-page {
+.viewer-layout {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
+    min-height: calc(100vh - 120px);
     background-color: #121212;
-    color: white;
-    min-height: 100vh;
-    padding: 1rem;
-    font-family: "Poppins", sans-serif; 
-}
-
-.stream-container {
-    flex: 3;
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    padding: 1rem;
-}
-
-.sidebar-chat {
-    flex: 1;
-    min-width: 300px; /* Asegura un ancho mínimo en desktop */
-    margin-left: 1rem;
-    background-color: #1a1a1a;
-    border-radius: 10px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px; /* Espacio entre el perfil y los regalos */
-}
-
-/* ------------------------------------------------
- * 2. Estilos de PERFIL/PUNTOS (Tu Avance)
- * ------------------------------------------------ */
-/* Contenedor usado por ComprarMonedas.jsx para centrar el contenido */
-.viewer-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; 
-    padding: 2rem;
-    background: radial-gradient(circle at top, #1e1e2f, #121212);
-    color: #f5f5f5;
-}
-
-.profile-card {
-    background: #1f1f2f;
-    border-radius: 15px; /* Ligeramente más pequeños para caber en el sidebar */
-    padding: 1.5rem;
-    width: 100%; 
-    box-shadow: 0 0 30px rgba(92, 39, 255, 0.3);
-    text-align: center;
-}
-
-.profile-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.profile-icon {
-    color: #8b5cf6;
-    margin-bottom: 0.5rem;
-}
-
-.profile-title {
-    font-size: 1.4rem; /* Más pequeño para el sidebar */
-    color: #8b5cf6;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.viewer-name {
-    font-size: 1.1rem;
     color: #fff;
+
+}
+
+/* 🟣 Columna izquierda */
+.viewer-canales {
+    width: 15%;
+    min-width: 180px;
+    background-color: #181818;
+    border-right: 1px solid #2a2a2a;
+    padding: 10px 6px;
+}
+
+/* 🟢 Columna central */
+.viewer-stream {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.stream-video {
+    background-color: #000;
+    width: 100%;
+    height: 60vh;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 1.2rem;
     margin-bottom: 1rem;
 }
 
-.progress-section {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 1rem;
-}
-
-.mb-1 {
-    margin-bottom: 1.5rem;
-}
-
-.info-row {
+.stream-info {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Alineación cambiada para el sidebar */
-    margin: 0.5rem 0;
-    gap: 0.5rem;
-}
-
-.coin-row {
-    margin-top: 1rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-.icon {
-    color: #7c3aed;
-}
-
-.label {
-    color: #aaa;
-}
-
-.value {
-    color: #fff;
-    font-weight: bold;
-}
-
-.coin-value {
-    color: #ffcc00; 
-    font-size: 1.1rem;
-}
-
-.progress-bar {
-    margin-top: 1rem;
-    height: 10px; /* Más delgado */
-    background: #2a2a40;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #7c3aed, #22c55e);
-    transition: width 0.3s ease;
-}
-
-.progress-text {
-    margin-top: 0.5rem;
-    color: #ccc;
-    font-size: 0.8rem;
-}
-
-/* ------------------------------------------------
- * 3. Estilos de la TIENDA (Usados por ComprarMonedas.jsx)
- * ------------------------------------------------ */
-
-.divider {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(139, 92, 246, 0), rgba(139, 92, 246, 0.75), rgba(139, 92, 246, 0));
-    margin: 2rem 0;
-}
-
-.store-title {
-    font-size: 1.6rem;
-    color: #f5f5f5;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-}
-
-.packs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
-}
-
-.pack-card {
-    background: #282838;
-    padding: 1.5rem 1rem;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease-in-out;
-    border: 2px solid transparent;
-}
-
-.pack-card:hover {
-    transform: translateY(-3px);
-    border-color: #8b5cf6;
-}
-
-.pack-coins-icon {
-    font-size: 2rem;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.pack-coins {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #ffcc00;
-    margin: 0 0 0.5rem 0;
-}
-
-.pack-price {
-    font-size: 1rem;
-    color: #ccc;
-    margin: 0 0 1rem 0;
-    font-weight: 300;
-}
-
-.purchase-button {
-    background-color: #22c55e;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
+    gap: 10px;
     width: 100%;
 }
 
-.purchase-button:hover {
-    background-color: #15803d;
+.stream-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-.purchase-success {
-    background-color: #15803d;
+.stream-detalle h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.stream-categoria {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+/* 🔵 Columna derecha (chat) */
+.viewer-chat {
+    width: 25%;
+    background-color: #181818;
+    border-left: 1px solid #2a2a2a;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.chat-mensajes p {
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.5;        /* 🔹 mejora el interlineado dentro del mismo mensaje */
+  word-wrap: break-word;
+}
+
+
+/* 🗨️ Caja de texto del chat */
+.chat-input {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-top: 1px solid #2a2a2a;
+    background-color: #202020;
+}
+
+.chat-input textarea {
+    flex: 1;
+    resize: none;
+    background-color: #121212;
     color: #fff;
-    padding: 0.75rem;
+    border: 1px solid #333;
     border-radius: 8px;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
-    animation: fadeInOut 3.5s forwards;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    height: 40px;
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(-10px); }
-    10% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(10px); }
+.chat-input textarea::placeholder {
+    color: #aaa;
 }
 
-/* Responsividad */
-@media (max-width: 900px) {
-    .viewer-page {
-        flex-direction: column;
+.chat-input button {
+    background-color: #3b3b3b;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.chat-input button:hover {
+    background-color: #4a4a4a;
+}
+
+/* 💎 Footer inferior */
+.chat-footer {
+    background-color: #202020;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border-top: 1px solid #2a2a2a;
+}
+
+.puntos {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.icono-puntos {
+    width: 22px;
+    height: 22px;
+}
+
+.btn-tienda {
+    background-color: #2a2a2a;
+    border: none;
+    color: white;
+    font-size: 1.3rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-tienda:hover {
+    background-color: #383838;
+}
+
+/* 🎁 Panel de regalos (overlay flotante) */
+.overlay-regalos {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 25%;
+    z-index: 20;
+}
+
+.panel-regalos {
+    background-color: #1e1e1e;
+    width: 340px;
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: 14px 14px 0 0;
+    border-top: 2px solid #444;
+    padding: 1rem;
+    animation: subir 0.3s ease;
+}
+
+@keyframes subir {
+    from {
+        transform: translateY(100%);
+        opacity: 0.5;
     }
-    .sidebar-chat {
-        margin-left: 0;
-        margin-top: 1rem;
-        min-width: auto;
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
-@media (max-width: 600px) {
-    .profile-card {
-        padding: 1rem;
-    }
-    .packs-grid {
-        grid-template-columns: 1fr;
-    }
+
+.chat-mensajes {
+  max-height: 350px;           /* Altura máxima del área de chat */
+  overflow-y: auto;            /* Scroll vertical si hay muchos mensajes */
+  padding: 8px 10px;
+  text-align: left;            /* Alineación a la izquierda */
+  line-height: 1.4;            /* Espaciado entre líneas */
+  scrollbar-width: none;       /* Oculta scrollbar en Firefox */
+}
+
+.chat-mensajes::-webkit-scrollbar {
+  display: none;               /* Oculta scrollbar en Chrome y Edge */
+}
+
+.chat-mensajes p {
+  margin: 4px 0;               /* Espacio entre mensajes */
+  word-wrap: break-word;
 }
