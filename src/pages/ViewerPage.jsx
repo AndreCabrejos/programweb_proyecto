@@ -3,11 +3,6 @@ import { useParams } from "react-router-dom";
 import CanalesRecomendados from "../components/CanalesRecomendados";
 import Regalos from "../components/Regalos";
 import mensajesData from "../data/mensajes.json";
-<<<<<<< Updated upstream
-import "./ViewerPage.css";
-
-export default function ViewerPage({ monedas, setMonedas }) {
-=======
 import canalesData from "../data/canales.json";
 
 import "./ViewerPage.css";
@@ -80,7 +75,6 @@ const ViewerProfileCard = ({ coins }) => {
 // Componente principal que fusiona el Stream con el Chat/Sidebar
 export default function ViewerPage({ monedas, setMonedas }) {
 
->>>>>>> Stashed changes
   const { canal } = useParams();
   const [canalSeleccionado, setCanalSeleccionado] = useState(() => {
     return (
