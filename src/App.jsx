@@ -79,7 +79,7 @@ export default function App() {
               path="/viewer/:canal"
               element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
             />
-             <Route path="/recargar" element={<RecargarMonodas />} />
+             <Route path="/recargar" element={<RecargarMonedas />} />
              </>
           )}
         </Routes>
