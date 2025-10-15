@@ -101,3 +101,7 @@ footer {
 .coin-display:hover {
   transform: scale(1.1);
 }
+
+.TyC{
+  text-align: left;
+}
