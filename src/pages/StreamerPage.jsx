@@ -115,30 +115,62 @@ export default function StreamerPage() {
           </div>
         </div>
 
-        <div className="dashboard-section-card">
-          <h3 className="section-header-title">
-            <FaPlayCircle /> Vista previa del stream
-          </h3>
-          <div className="stream-preview-container">
-            {!isStreaming ? (
-              <div className="stream-offline-overlay">
-                <img src="https://wallpapers.com/images/high/dark-tech-patterns-4k-gaming-background-628p019s8k6908v9.webp" alt="Offline background" className="stream-offline-image" />
-                <div className="offline-text">OFFLINE</div>
-                <div className="offline-subtext">Tu stream está fuera de línea</div>
-              </div>
-            ) : (
-                // Aquí iría el reproductor de video real cuando el streamer esté en vivo
-                <p>¡Tu stream está en vivo!</p>
-            )}
-            <div className="stream-controls-overlay">
-                {!isStreaming ? (
-                <button className="stream-button start-stream-btn" onClick={startStream}>Iniciar Transmisión</button>
-                ) : (
-                <button className="stream-button stop-stream-btn" onClick={stopStream}>Detener Transmisión</button>
-                )}
-            </div>
-          </div>
-        </div>
+       <div className="dashboard-section-card">
+        <div className="dashboard-section-card level-progress-section">
+  <h3 className="section-header-title">
+    <FaPlayCircle /> Progreso hacia el siguiente nivel
+  </h3>
+  <div className="level-progress-container">
+    <div
+      className="level-progress-bar"
+      style={{
+        width: `${Math.min(
+          (streamerInfo.horas_totales / streamerInfo.horas_para_subir) * 100,
+          100
+        )}%`,
+      }}
+    ></div>
+  </div>
+  <p className="level-progress-text">
+    Faltan {(streamerInfo.horas_para_subir - streamerInfo.horas_totales).toFixed(2)} horas para tu siguiente nivel
+  </p>
+</div>
+
+  <h3 className="section-header-title">
+    <FaPlayCircle /> Vista previa del stream
+  </h3>
+  <div className="stream-preview-container">
+    {!isStreaming ? (
+      <div className="stream-offline-overlay">
+        <img
+          src="https://wallpapers.com/images/high/dark-tech-patterns-4k-gaming-background-628p019s8k6908v9.webp"
+          alt="Offline background"
+          className="stream-offline-image"
+        />
+        <div className="offline-text">OFFLINE</div>
+        <div className="offline-subtext">Tu stream está fuera de línea</div>
+      </div>
+    ) : (
+      // Aquí iría el reproductor de video real cuando el streamer esté en vivo
+      <p>¡Tu stream está en vivo!</p>
+    )}
+    
+    
+
+    <div className="stream-controls-overlay">
+      {!isStreaming ? (
+        <button className="stream-button start-stream-btn" onClick={startStream}>
+          Iniciar Transmisión
+        </button>
+      ) : (
+        <button className="stream-button stop-stream-btn" onClick={stopStream}>
+          Detener Transmisión
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
         
         {levelUpNotice && (
             <div className="level-up-notice">
