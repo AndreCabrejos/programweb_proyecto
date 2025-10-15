@@ -142,7 +142,10 @@ export default function ViewerPage({ monedas, setMonedas }) {
           <div className="chat-mensajes" ref={mensajesRef}>
             {mensajes.map((m) => (
               <p key={m.id}>
-                <strong>{m.usuario}:</strong> {m.texto}
+                <strong>
+                  {m.usuario} - ⭐ Nivel {m.nivel ?? 1}:
+                </strong>{" "}
+                {m.texto}
               </p>
             ))}
           </div>
