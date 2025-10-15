@@ -1,46 +1,52 @@
-import { useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import LoginModal from './components/LoginModal';
-import Home from './pages/Home';
-import Nosotros from './pages/Nosotros';
-import TyC from './pages/TyC';
-import StreamerPage from './pages/StreamerPage';
-import ViewerPage from './pages/ViewerPage';
-import ComprarMonedas from './pages/ComprarMonedas';
-import Regalos from "./components/Regalos";
+import { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import LoginModal from "./components/LoginModal";
+import Home from "./pages/Home";
+import Nosotros from "./pages/Nosotros";
+import TyC from "./pages/TyC";
+import StreamerPage from "./pages/StreamerPage";
+import ViewerPage from "./pages/ViewerPage";
+import RegisterPage from "./pages/RegisterPage"; // ✅ Ruta de Crear Cuenta
+import ComprarMonedas from './pages/ComprarMonedas'; // ✅ Ruta de Compra de Monedas
+import PerfilPage from "./pages/PerfilPage"; // 👈 import nuevo
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [monedas, setMonedas] = useState(100);
+  // Estado de monedas centralizado
+  const [monedas, setMonedas] = useState(100); 
   const navigate = useNavigate();
 
   const handleLogin = (email, password) => {
-    if (email === 'streamer@streamoria.com' && password === '1234') {
+    if (email === "streamer@streamoria.com" && password === "1234") {
       setIsLoggedIn(true);
-      setUserRole('streamer');
+      setUserRole("streamer");
       setShowLogin(false);
-      navigate('/streamer');
-    } else if (email === 'viewer@streamoria.com' && password === '1234') {
+      navigate("/streamer");
+    } else if (email === "viewer@streamoria.com" && password === "1234") {
       setIsLoggedIn(true);
-      setUserRole('viewer');
+      setUserRole("viewer");
       setShowLogin(false);
-      navigate('/viewer');
+
+      navigate('/'); // 👈 te lleva al Home (donde estarán los canales recomendados)
+
     } else {
-      alert('Credenciales incorrectas');
+      // Usamos console.error en lugar de alert()
+      console.error("Credenciales incorrectas");
     }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserRole(null);
-    navigate('/');
+    navigate("/");
   };
 
-  // 🪙 función para sumar monedas
+  // 🪙 Función para sumar monedas
   const manejarCompraMonedas = (cantidad) => {
     setMonedas(monedas + cantidad);
   };
@@ -56,9 +62,13 @@ export default function App() {
 
       <main>
         <Routes>
+          <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/" element={<Home />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/tyc" element={<TyC />} />
+          
+          {/* Rutas de features nuevas y fusionadas */}
+          <Route path="/register" element={<RegisterPage />} /> 
           <Route path="/comprar" element={<ComprarMonedas onBuy={manejarCompraMonedas} />} />
 
           {isLoggedIn && userRole === 'streamer' && (
@@ -66,17 +76,20 @@ export default function App() {
           )}
           {isLoggedIn && userRole === 'viewer' && (
             <Route
-              path="/viewer"
+              path="/viewer/:canal"
               element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
             />
           )}
+
 
         </Routes>
       </main>
 
       <Footer />
 
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />}
+      {showLogin && (
+        <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />
+      )}
     </>
   );
 }
