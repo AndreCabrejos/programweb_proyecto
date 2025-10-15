@@ -6,18 +6,18 @@ import LoginModal from "./components/LoginModal";
 import Home from "./pages/Home";
 import Nosotros from "./pages/Nosotros";
 import TyC from "./pages/TyC";
-import StreamerPage from "./pages/StreamerPage";
+import StreamerPage from "./pages/StreamerPage"; // Importar StreamerPage
 import ViewerPage from "./pages/ViewerPage";
-import RegisterPage from "./pages/RegisterPage"; // ✅ Ruta de Crear Cuenta
-import ComprarMonedas from './pages/ComprarMonedas'; // ✅ Ruta de Compra de Monedas
-import PerfilPage from "./pages/PerfilPage"; // 👈 import nuevo
-
+import RegisterPage from "./pages/RegisterPage";
+import ComprarMonedas from './pages/ComprarMonedas';
+import PerfilPage from "./pages/PerfilPage";
+import RecargarMonedas from './components/RecargarMonedasModal';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  // Estado de monedas centralizado
+  const [showRecargarModal, setShowRecargarModal] = useState(false);
   const [monedas, setMonedas] = useState(100); 
   const navigate = useNavigate();
 
@@ -26,16 +26,13 @@ export default function App() {
       setIsLoggedIn(true);
       setUserRole("streamer");
       setShowLogin(false);
-      navigate("/streamer");
+      navigate("/streamer"); // Redirigir al dashboard del streamer
     } else if (email === "viewer@streamoria.com" && password === "1234") {
       setIsLoggedIn(true);
       setUserRole("viewer");
       setShowLogin(false);
-
-      navigate('/'); // 👈 te lleva al Home (donde estarán los canales recomendados)
-
+      navigate('/');
     } else {
-      // Usamos console.error en lugar de alert()
       console.error("Credenciales incorrectas");
     }
   };
@@ -46,7 +43,6 @@ export default function App() {
     navigate("/");
   };
 
-  // 🪙 Función para sumar monedas
   const manejarCompraMonedas = (cantidad) => {
     setMonedas(monedas + cantidad);
   };
@@ -55,9 +51,11 @@ export default function App() {
     <>
       <Header
         isLoggedIn={isLoggedIn}
+        userRole={userRole} 
         onLoginClick={() => setShowLogin(true)}
         onLogoutClick={handleLogout}
         monedas={monedas}
+        onRecargarClick={() => setShowRecargarModal(true)} 
       />
 
       <main>
@@ -67,21 +65,23 @@ export default function App() {
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/tyc" element={<TyC />} />
           
-          {/* Rutas de features nuevas y fusionadas */}
           <Route path="/register" element={<RegisterPage />} /> 
           <Route path="/comprar" element={<ComprarMonedas onBuy={manejarCompraMonedas} />} />
 
+          {/* Rutas protegidas para el streamer */}
           {isLoggedIn && userRole === 'streamer' && (
-            <Route path="/streamer" element={<StreamerPage />} />
+            // Agrega aquí todas las sub-rutas si las implementas en el futuro
+            <Route path="/streamer/*" element={<StreamerPage />} /> 
           )}
           {isLoggedIn && userRole === 'viewer' && (
+            <>
             <Route
               path="/viewer/:canal"
               element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
             />
+             <Route path="/recargar" element={<RecargarMonedas />} />
+             </>
           )}
-
-
         </Routes>
       </main>
 
@@ -89,6 +89,14 @@ export default function App() {
 
       {showLogin && (
         <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />
+      )}
+
+      {showRecargarModal && (
+        <RecargarMonedas 
+          monedas={monedas} 
+          setMonedas={setMonedas} 
+          onClose={() => setShowRecargarModal(false)} 
+        />
       )}
     </>
   );
