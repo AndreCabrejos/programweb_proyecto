@@ -5,7 +5,6 @@ import CanalesRecomendados from "../components/CanalesRecomendados";
 import Regalos from "../components/Regalos";
 import mensajesData from "../data/mensajes.json";
 import canalesData from "../data/canales.json";
-
 import "./ViewerPage.css";
 
 
