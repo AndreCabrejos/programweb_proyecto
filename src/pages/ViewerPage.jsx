@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CanalesRecomendados from "../components/CanalesRecomendados";
@@ -68,8 +69,6 @@ const ViewerProfileCard = ({ coins }) => {
     </div>
   );
 };
-// ----------------------------------------------------
-
 
 
 // Componente principal que fusiona el Stream con el Chat/Sidebar
@@ -126,10 +125,12 @@ export default function ViewerPage({ monedas, setMonedas }) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleEnviarMensaje(e);
+
     }
   };
 
   return (
+
     <div className="viewer-layout">
       <aside className="viewer-canales">
         <CanalesRecomendados />
@@ -172,7 +173,10 @@ export default function ViewerPage({ monedas, setMonedas }) {
           <div className="chat-mensajes" ref={mensajesRef}>
             {mensajes.map((m) => (
               <p key={m.id}>
-                <strong>{m.usuario}:</strong> {m.texto}
+                <strong>
+                  {m.usuario} - ⭐ Nivel {m.nivel ?? 1}:
+                </strong>{" "}
+                {m.texto}
               </p>
             ))}
           </div>
@@ -208,6 +212,7 @@ export default function ViewerPage({ monedas, setMonedas }) {
             onClose={() => setMostrarRegalos(false)}
           />
         )}
+
       </aside>
     </div >
   );

@@ -4,6 +4,7 @@
     min-height: calc(100vh - 120px);
     background-color: #121212;
     color: #fff;
+
 }
 
 /* 🟣 Columna izquierda */
@@ -18,6 +19,7 @@
 /* 🟢 Columna central */
 .viewer-stream {
     flex: 1;
+
     display: flex;
     flex-direction: column;
     align-items: stretch;   /* ✅ los elementos ocuparán todo el ancho */

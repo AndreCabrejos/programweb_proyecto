@@ -3,6 +3,7 @@ import "./Home.css";
 
 export default function Home() {
   return (
+
     <div className="home-layout">
       <aside className="canales-sidebar">
         <CanalesRecomendados />
@@ -13,5 +14,6 @@ export default function Home() {
         <p>Explora canales en vivo y descubre nuevos creadores.</p>
       </section>
     </div>
+
   );
 }
