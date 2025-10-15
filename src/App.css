@@ -177,23 +177,39 @@ footer {
   color: white;
   border-radius: 12px;
   padding: 20px;
-  width: 280px;
+  width: 320px; /* un poco más ancho para texto adicional */
   text-align: center;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .barra-progreso {
   width: 100%;
-  height: 10px;
+  height: 12px; /* un poco más gruesa para mejor visibilidad */
   background: #333;
-  border-radius: 5px;
-  margin: 10px 0;
+  border-radius: 6px;
+  margin: 15px 0;
+  overflow: hidden;
 }
 
 .progreso {
   height: 100%;
-  background: #b47cff;
-  border-radius: 5px;
+  background: linear-gradient(90deg, #8b5cf6, #22c55e);
+  border-radius: 6px;
+  transition: width 0.4s ease-in-out;
+}
+
+.texto-progreso {
+  color: #ccc;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.texto-avance {
+  color: #ddd;
+  font-size: 1rem;
+  margin: 12px 0 0 0;
+  font-weight: 600;
 }
 
 .cerrar-perfil {
@@ -201,9 +217,10 @@ footer {
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 20px;
+  transition: background 0.3s ease;
 }
 
 .cerrar-perfil:hover {
