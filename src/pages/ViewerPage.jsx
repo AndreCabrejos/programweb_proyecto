@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CanalesRecomendados from "../components/CanalesRecomendados";
 import Regalos from "../components/Regalos";
+import Notificacion from "../components/Notificacion";
 import mensajesData from "../data/mensajes.json";
 import canalesData from "../data/canales.json";
 import "./ViewerPage.css";
@@ -72,7 +73,8 @@ const ViewerProfileCard = ({ coins }) => {
 
 // Componente principal que fusiona el Stream con el Chat/Sidebar
 export default function ViewerPage({ monedas, setMonedas }) {
-
+    const [nivel, setNivel] = useState(1); // Nivel del usuario
+  const [showNotif, setShowNotif] = useState(false); // Mostrar o no la notificación
   const { canal } = useParams();
   const [canalSeleccionado, setCanalSeleccionado] = useState(() => {
     return (
@@ -85,6 +87,7 @@ export default function ViewerPage({ monedas, setMonedas }) {
   const [mensaje, setMensaje] = useState("");
   const [puntos, setPuntos] = useState(0);
   const [mensajes, setMensajes] = useState(mensajesData);
+  const [mensajeNotif, setMensajeNotif] = useState("");
   const mensajesRef = useRef(null);
 
   useEffect(() => {
@@ -100,6 +103,15 @@ export default function ViewerPage({ monedas, setMonedas }) {
       mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
     }
   }, [mensajes]);
+
+  useEffect(() => {
+    if (puntos >= nivel * 100) {
+      const nuevoNivel = nivel + 1;
+      setNivel(nuevoNivel);
+      setMensajeNotif(`🎉 ¡Has subido al nivel ${nuevoNivel}!`);
+      setShowNotif(true);
+    }
+  }, [puntos]);
 
   const handleEnviarRegalo = (regalo) => {
     setMonedas((prev) => prev - regalo.costo);
@@ -127,6 +139,15 @@ export default function ViewerPage({ monedas, setMonedas }) {
 
     }
   };
+
+  useEffect(() => {
+    if (showNotif) {
+      const timer = setTimeout(() => setShowNotif(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showNotif]);
+  
+    
 
   return (
 
@@ -164,6 +185,7 @@ export default function ViewerPage({ monedas, setMonedas }) {
               <span className="label-espectadores">Espectadores</span>
             </div>
           </div>
+          <p className="nivel-actual">⭐ Nivel actual: {nivel}</p>
         </div>
       </main >
 
@@ -213,6 +235,22 @@ export default function ViewerPage({ monedas, setMonedas }) {
         )}
 
       </aside>
+      {/* Notificación solo aparece cuando showNotif es true */}
+      <Notificacion
+        message={mensajeNotif}
+        show={showNotif}
+        onClose={() => setShowNotif(false)}
+      />
+
+      
     </div >
+    
+    
+    
+
+
+    
+
+    
   );
 }

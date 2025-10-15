@@ -1,3 +1,4 @@
+import "./TyC.css";
 export default function TyC() {
   function volver() {
     window.history.back();
