@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../App.css";
 
 // Definición de niveles
@@ -12,7 +13,7 @@ const niveles = [
   { nivel: 7, xp_min: 2100 },
 ];
 
-const Header = ({ isLoggedIn, onLoginClick, onLogoutClick, monedas, puntos = 1200 }) => {
+const Header = ({ isLoggedIn, userRole, onLoginClick, onLogoutClick, onRecargarClick, monedas, puntos = 1200 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [perfilVisible, setPerfilVisible] = useState(false);
 
@@ -68,7 +69,11 @@ const Header = ({ isLoggedIn, onLoginClick, onLogoutClick, monedas, puntos = 120
             <span className="monedas-display">🪙 {monedas}</span>
           </>
         )}
-
+        {isLoggedIn && userRole === "viewer" && (
+          <button className="nav-link btn-recargar" onClick={onRecargarClick}>
+            Recargar
+          </button>
+        )}
         {!isLoggedIn && (
           <button className="login-button" onClick={onLoginClick}>
             Iniciar Sesión
