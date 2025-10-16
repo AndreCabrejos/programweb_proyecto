@@ -5,6 +5,7 @@ import initialViewerLevels from '../data/viewerLevels.json';
 import StreamerSidebar from '../components/StreamerSidebar';
 import StreamerRightSidebar from '../components/StreamerRightSidebar';
 import { FaInfoCircle, FaPlayCircle, FaCogs } from 'react-icons/fa';
+import GiftOverlay from "../components/GiftOverlay";
 
 export default function StreamerPage() {
   const [isStreaming, setIsStreaming] = useState(false);
@@ -12,6 +13,9 @@ export default function StreamerPage() {
   const [streamerInfo, setStreamerInfo] = useState(streamerData);
   const [levelUpNotice, setLevelUpNotice] = useState(false);
   const [viewerLevels, setViewerLevels] = useState(initialViewerLevels);
+  const [showGiftOverlay, setShowGiftOverlay] = useState(false);
+  const [giftData, setGiftData] = useState(null);
+
 
   useEffect(() => {
     let interval;
@@ -117,10 +121,10 @@ export default function StreamerPage() {
 
        <div className="dashboard-section-card">
         <div className="dashboard-section-card level-progress-section">
-  <h3 className="section-header-title">
+    <h3 className="section-header-title">
     <FaPlayCircle /> Progreso hacia el siguiente nivel
-  </h3>
-  <div className="level-progress-container">
+    </h3>
+   <div className="level-progress-container">
     <div
       className="level-progress-bar"
       style={{
@@ -130,16 +134,16 @@ export default function StreamerPage() {
         )}%`,
       }}
     ></div>
-  </div>
-  <p className="level-progress-text">
+    </div>
+   <p className="level-progress-text">
     Faltan {(streamerInfo.horas_para_subir - streamerInfo.horas_totales).toFixed(2)} horas para tu siguiente nivel
-  </p>
-</div>
+   </p>
+   </div>
 
-  <h3 className="section-header-title">
+   <h3 className="section-header-title">
     <FaPlayCircle /> Vista previa del stream
-  </h3>
-  <div className="stream-preview-container">
+   </h3>
+   <div className="stream-preview-container">
     {!isStreaming ? (
       <div className="stream-offline-overlay">
         <img
@@ -154,6 +158,36 @@ export default function StreamerPage() {
       // Aquí iría el reproductor de video real cuando el streamer esté en vivo
       <p>¡Tu stream está en vivo!</p>
     )}
+
+    <div className="stream-controls-overlay">
+   {!isStreaming ? (
+    <button className="stream-button start-stream-btn" onClick={startStream}>
+      Iniciar Transmisión
+    </button>
+   ) : (
+    <>
+      <button className="stream-button stop-stream-btn" onClick={stopStream}>
+        Detener Transmisión
+      </button>
+      <button
+         className="stream-button simulate-gift-btn"
+          onClick={() => {
+    
+         setShowGiftOverlay(false);
+           setGiftData(null);
+          setTimeout(() => {
+           setGiftData({ nombre: "Super Corazón 💖", costo: 100, puntos: 50 });
+           setShowGiftOverlay(true);
+           }, 50); // pequeño delay para reiniciar correctamente
+              }}
+        >
+          🎁 Simular Regalo
+       </button>
+
+    </>
+   )}
+   </div>
+
     
     
 
@@ -168,8 +202,8 @@ export default function StreamerPage() {
         </button>
       )}
     </div>
-  </div>
-</div>
+   </div>
+   </div>
 
         
         {levelUpNotice && (
@@ -207,6 +241,12 @@ export default function StreamerPage() {
       </div>
 
       <StreamerRightSidebar streamerInfo={streamerInfo} isStreaming={isStreaming} />
+      <GiftOverlay
+        show={showGiftOverlay}
+        regalo={giftData}
+        espectador="André"
+        onClose={() => setShowGiftOverlay(false)}
+      />
     </div>
   );
 }
