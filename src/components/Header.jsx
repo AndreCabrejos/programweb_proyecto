@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
 
 // Definición de niveles
@@ -13,18 +13,19 @@ const niveles = [
   { nivel: 7, xp_min: 2100 },
 ];
 
-const Header = ({ isLoggedIn, userRole, onLoginClick, onLogoutClick, onRecargarClick, monedas, puntos = 1200 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+export default function Header({
+  isLoggedIn,
+  userRole,
+  onLoginClick,
+  onLogoutClick,
+  onRecargarClick,
+  monedas,
+  puntos = 1200,
+}) {
   const [perfilVisible, setPerfilVisible] = useState(false);
+  const navigate = useNavigate();
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
-  const mostrarPerfil = () => {
-    setPerfilVisible(true);
-    setMenuOpen(false);
-  };
-  const cerrarPerfil = () => setPerfilVisible(false);
-
-  // Cálculo de nivel actual y siguiente
+  // Calcular nivel actual
   let nivelActual = niveles[0];
   let siguienteNivel = null;
 
@@ -38,77 +39,109 @@ const Header = ({ isLoggedIn, userRole, onLoginClick, onLogoutClick, onRecargarC
   }
 
   const xpDesdeNivelActual = puntos - nivelActual.xp_min;
-  const tramoNivel = siguienteNivel ? (siguienteNivel.xp_min - nivelActual.xp_min) : 1;
+  const tramoNivel = siguienteNivel
+    ? siguienteNivel.xp_min - nivelActual.xp_min
+    : 1;
   const porcentaje = siguienteNivel
     ? Math.min((xpDesdeNivelActual / tramoNivel) * 100, 100)
     : 100;
 
-  const puntosFaltantes = siguienteNivel ? (siguienteNivel.xp_min - puntos) : 0;
+  const puntosFaltantes = siguienteNivel ? siguienteNivel.xp_min - puntos : 0;
 
   return (
     <header className="main-header">
-      <div className="logo">Streamoria</div>
-      <nav className="nav-links">
-        <a href="/">Inicio</a>
-        <a href="/nosotros">Nosotros</a>
-        <a href="/tyc">TyC</a>
+      <h1 className="logo">🎥 Streamoria</h1>
 
-        {isLoggedIn && (
+      <nav className="nav-links-right">
+        <Link to="/">Inicio</Link>
+        <Link to="/nosotros">Nosotros</Link>
+        <Link to="/tyc">TyC</Link>
+
+        {isLoggedIn ? (
           <>
-            <div className="user-menu-container">
-              <button className="login-button emoji-btn" onClick={toggleMenu}>
-                👤
-              </button>
-              {menuOpen && (
-                <div className="dropdown-menu">
-                  <button onClick={mostrarPerfil}>Perfil</button>
-                  <button onClick={onLogoutClick}>Cerrar sesión</button>
-                </div>
-              )}
-            </div>
-            <span className="monedas-display">🪙 {monedas}</span>
+            {/* Botón monedas */}
+            <button
+              className="btn-monedas"
+              onClick={() => navigate("/comprar")}
+            >
+              🪙 {monedas}
+            </button>
+
+            {/* Botón perfil */}
+            <button
+              className="btn-perfil"
+              onClick={() => setPerfilVisible(true)}
+            >
+              👤
+            </button>
           </>
-        )}
-        {isLoggedIn && userRole === "viewer" && (
-          <button className="nav-link btn-recargar" onClick={onRecargarClick}>
-            Recargar
+        ) : (
+          <button onClick={onLoginClick} className="btn-login">
+            Iniciar sesión
           </button>
         )}
-        {!isLoggedIn && (
-          <button className="login-button" onClick={onLoginClick}>
-            Iniciar Sesión
+
+        {/* Si el usuario es viewer → botón recargar */}
+        {isLoggedIn && userRole === "viewer" && (
+          <button className="btn-recargar" onClick={onRecargarClick}>
+            Recargar
           </button>
         )}
       </nav>
 
+      {/* MODAL DE PERFIL */}
       {perfilVisible && (
         <div className="perfil-modal">
           <div className="perfil-contenido">
             <h3>Mi Perfil</h3>
-            <p><strong>Nivel:</strong> {nivelActual.nivel}</p>
-            <p><strong>Puntos:</strong> {puntos}</p>
+            <p>
+              <strong>Nivel:</strong> {nivelActual.nivel}
+            </p>
+            <p>
+              <strong>Puntos:</strong> {puntos}
+            </p>
 
             {siguienteNivel ? (
               <p className="texto-avance">
-                Te faltan <strong>{puntosFaltantes}</strong> puntos para el nivel <strong>{siguienteNivel.nivel}</strong>.
+                Te faltan <strong>{puntosFaltantes}</strong> puntos para el
+                nivel <strong>{siguienteNivel.nivel}</strong>.
               </p>
             ) : (
               <p className="texto-avance">¡Has alcanzado el nivel máximo!</p>
             )}
 
             <div className="barra-progreso">
-              <div className="progreso" style={{ width: `${porcentaje}%` }}></div>
-            </div> 
+              <div
+                className="progreso"
+                style={{ width: `${porcentaje}%` }}
+              ></div>
+            </div>
+
             <p className="texto-progreso">
               Progreso hacia el siguiente nivel: {porcentaje.toFixed(1)}%
             </p>
 
-            <button className="cerrar-perfil" onClick={cerrarPerfil}>Cerrar</button>
+            {/* Botón cerrar sesión dentro del modal */}
+            <button
+              className="cerrar-perfil"
+              onClick={() => {
+                setPerfilVisible(false);
+                onLogoutClick();
+              }}
+            >
+              Cerrar sesión
+            </button>
+
+            {/* Botón para cerrar solo el modal */}
+            <button
+              className="cerrar-modal"
+              onClick={() => setPerfilVisible(false)}
+            >
+              ✖
+            </button>
           </div>
         </div>
       )}
     </header>
   );
-};
-
-export default Header;
+}
