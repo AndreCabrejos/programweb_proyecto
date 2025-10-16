@@ -98,7 +98,7 @@ const Header = ({ isLoggedIn, userRole, onLoginClick, onLogoutClick, onRecargarC
 
             <div className="barra-progreso">
               <div className="progreso" style={{ width: `${porcentaje}%` }}></div>
-            </div>
+            </div> 
             <p className="texto-progreso">
               Progreso hacia el siguiente nivel: {porcentaje.toFixed(1)}%
             </p>
