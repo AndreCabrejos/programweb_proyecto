@@ -105,13 +105,26 @@ export default function ViewerPage({ monedas, setMonedas }) {
   }, [mensajes]);
 
   useEffect(() => {
-    if (puntos >= nivel * 100) {
-      const nuevoNivel = nivel + 1;
-      setNivel(nuevoNivel);
-      setMensajeNotif(`🎉 ¡Has subido al nivel ${nuevoNivel}!`);
-      setShowNotif(true);
-    }
-  }, [puntos]);
+  const puntosNecesarios = nivel * 30;
+  if (puntos >= puntosNecesarios) {
+    const nuevoNivel = nivel + 1;
+    setNivel(nuevoNivel);
+    setMensajeNotif(`🎉 ¡Has subido al nivel ${nuevoNivel}!`);
+    setShowNotif(true);
+
+    // 🔹 Reinicia los puntos sobrantes en el nuevo nivel
+    setPuntos((prev) => prev - puntosNecesarios);
+  }
+}, [puntos, nivel]);
+
+
+  useEffect(() => {
+  if (showNotif) {
+    const timer = setTimeout(() => setShowNotif(false), 8000);
+    return () => clearTimeout(timer);
+  }
+}, [showNotif]);
+
 
   const handleEnviarRegalo = (regalo) => {
     setMonedas((prev) => prev - regalo.costo);
