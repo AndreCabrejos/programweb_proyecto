@@ -5,6 +5,7 @@ import initialViewerLevels from '../data/viewerLevels.json';
 import StreamerSidebar from '../components/StreamerSidebar';
 import StreamerRightSidebar from '../components/StreamerRightSidebar';
 import GiftManager from '../components/StreamerGifts';
+import GiftOverlay from '../components/GiftOverlay';
 import { FaInfoCircle, FaPlayCircle, FaCogs, FaGift } from 'react-icons/fa';
 
 export default function StreamerPage() {
@@ -13,6 +14,8 @@ export default function StreamerPage() {
   const [streamerInfo, setStreamerInfo] = useState(streamerData);
   const [levelUpNotice, setLevelUpNotice] = useState(false);
   const [viewerLevels, setViewerLevels] = useState(initialViewerLevels);
+  const [showGiftOverlay, setShowGiftOverlay] = useState(false);
+  const [giftData, setGiftData] = useState(null);
 
   useEffect(() => {
     let interval;
@@ -20,7 +23,8 @@ export default function StreamerPage() {
       interval = setInterval(() => {
         const now = new Date();
         const elapsedSeconds = (now - streamStartTime) / 1000;
-        const newTotalHours = streamerInfo.horas_totales + (elapsedSeconds / 3600);
+        const newTotalHours = streamerInfo.horas_totales + elapsedSeconds / 3600;
+
         if (newTotalHours >= streamerInfo.horas_para_subir) {
           setStreamerInfo(prev => ({
             ...prev,
@@ -30,6 +34,7 @@ export default function StreamerPage() {
           setLevelUpNotice(true);
           setTimeout(() => setLevelUpNotice(false), 5000);
         }
+
         setStreamerInfo(prev => ({
           ...prev,
           horas_totales: newTotalHours
@@ -37,7 +42,7 @@ export default function StreamerPage() {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isStreaming, streamStartTime, streamerInfo]);
+  }, [isStreaming, streamStartTime]);
 
   const startStream = () => {
     setIsStreaming(true);
@@ -55,17 +60,9 @@ export default function StreamerPage() {
     setViewerLevels(newLevels);
   };
 
-  const getLiveHours = () => {
-    if (!isStreaming || !streamStartTime) return 0;
-    const now = new Date();
-    const elapsedSeconds = (now - streamStartTime) / 1000;
-    return elapsedSeconds / 3600;
-  };
-
   const getStreamDuration = () => {
     if (!isStreaming || !streamStartTime) return "00:00:00";
-    const now = new Date();
-    const elapsedSeconds = Math.floor((now - streamStartTime) / 1000);
+    const elapsedSeconds = Math.floor((new Date() - streamStartTime) / 1000);
     const hours = Math.floor(elapsedSeconds / 3600);
     const minutes = Math.floor((elapsedSeconds % 3600) / 60);
     const seconds = elapsedSeconds % 60;
@@ -77,39 +74,37 @@ export default function StreamerPage() {
   return (
     <div className="streamer-dashboard-layout">
       <StreamerSidebar />
+
       <div className="dashboard-main-content">
+
         <div className="dashboard-section-card">
-          <h3 className="section-header-title">
-            <FaInfoCircle /> Información de la sesión
-          </h3>
+          <h3 className="section-header-title"><FaInfoCircle /> Información de la sesión</h3>
           <div className="session-info-grid">
-            <div className="session-info-item">
-              <h5>Sesión</h5>
-              <p>{isStreaming ? "EN VIVO" : "SIN CONEXIÓN"}</p>
-            </div>
-            <div className="session-info-item">
-              <h5>Espectadores</h5>
-              <p>0</p>
-            </div>
-            <div className="session-info-item">
-              <h5>Seguidores</h5>
-              <p>1</p>
-            </div>
-            <div className="session-info-item">
-              <h5>Suscripciones</h5>
-              <p>0</p>
-            </div>
-            <div className="session-info-item">
-              <h5>Tiempo en vivo</h5>
-              <p>{getStreamDuration()}</p>
-            </div>
+            <div className="session-info-item"><h5>Sesión</h5><p>{isStreaming ? "EN VIVO" : "SIN CONEXIÓN"}</p></div>
+            <div className="session-info-item"><h5>Espectadores</h5><p>0</p></div>
+            <div className="session-info-item"><h5>Seguidores</h5><p>1</p></div>
+            <div className="session-info-item"><h5>Suscripciones</h5><p>0</p></div>
+            <div className="session-info-item"><h5>Tiempo en vivo</h5><p>{getStreamDuration()}</p></div>
           </div>
         </div>
 
+        <div className="dashboard-section-card level-progress-section">
+          <h3 className="section-header-title"><FaPlayCircle /> Progreso hacia el siguiente nivel</h3>
+          <div className="level-progress-container">
+            <div
+              className="level-progress-bar"
+              style={{
+                width: `${Math.min((streamerInfo.horas_totales / streamerInfo.horas_para_subir) * 100, 100)}%`
+              }}
+            />
+          </div>
+          <p className="level-progress-text">
+            Faltan {(streamerInfo.horas_para_subir - streamerInfo.horas_totales).toFixed(2)} horas para tu siguiente nivel
+          </p>
+        </div>
+
         <div className="dashboard-section-card">
-          <h3 className="section-header-title">
-            <FaPlayCircle /> Vista previa del stream
-          </h3>
+          <h3 className="section-header-title"><FaPlayCircle /> Vista previa del stream</h3>
           <div className="stream-preview-container">
             {!isStreaming ? (
               <div className="stream-offline-overlay">
@@ -124,40 +119,45 @@ export default function StreamerPage() {
             ) : (
               <p>🎬 ¡Tu stream está en vivo!</p>
             )}
+
             <div className="stream-controls-overlay">
               {!isStreaming ? (
                 <button className="stream-button start-stream-btn" onClick={startStream}>
                   Iniciar Transmisión
                 </button>
               ) : (
-                <button className="stream-button stop-stream-btn" onClick={stopStream}>
-                  Detener Transmisión
-                </button>
+                <>
+                  <button className="stream-button stop-stream-btn" onClick={stopStream}>
+                    Detener Transmisión
+                  </button>
+                  <button
+                    className="stream-button simulate-gift-btn"
+                    onClick={() => {
+                      setShowGiftOverlay(false);
+                      setGiftData(null);
+                      setTimeout(() => {
+                        setGiftData({ nombre: "Super Corazón 💖", costo: 100, puntos: 50 });
+                        setShowGiftOverlay(true);
+                      }, 50);
+                    }}
+                  >
+                    🎁 Simular Regalo
+                  </button>
+                </>
               )}
             </div>
           </div>
         </div>
 
-        {levelUpNotice && (
-          <div className="level-up-notice">
-            ¡Felicidades! Has subido al nivel {streamerInfo.nivel}.
-          </div>
-        )}
-
         <div className="stream-actions-and-levels">
           <div className="dashboard-section-card stream-actions-card">
-            <h3 className="section-header-title">
-              <FaCogs /> Controles del Stream
-            </h3>
+            <h3 className="section-header-title"><FaCogs /> Controles del Stream</h3>
             <p>Horas totales: {streamerInfo.horas_totales.toFixed(2)}</p>
-            <p>Horas actuales: {getLiveHours().toFixed(2)}</p>
             <p>Horas para subir: {streamerInfo.horas_para_subir}</p>
           </div>
 
           <div className="dashboard-section-card viewer-level-config-card">
-            <h3 className="section-header-title">
-              <FaCogs /> Niveles de Espectadores
-            </h3>
+            <h3 className="section-header-title"><FaCogs /> Niveles de Espectadores</h3>
             {viewerLevels.map((level, index) => (
               <div key={level.nivel} className="level-config-item">
                 <label>Nivel {level.nivel}:</label>
@@ -172,13 +172,25 @@ export default function StreamerPage() {
         </div>
 
         <div className="dashboard-section-card">
-          <h3 className="section-header-title">
-            <FaGift /> Gestión de Regalos
-          </h3>
+          <h3 className="section-header-title"><FaGift /> Gestión de Regalos</h3>
           <GiftManager />
         </div>
+
+        {levelUpNotice && (
+          <div className="level-up-notice">
+            ¡Felicidades! Has subido al nivel {streamerInfo.nivel}.
+          </div>
+        )}
       </div>
+
       <StreamerRightSidebar streamerInfo={streamerInfo} isStreaming={isStreaming} />
+
+      <GiftOverlay
+        show={showGiftOverlay}
+        regalo={giftData}
+        espectador="André"
+        onClose={() => setShowGiftOverlay(false)}
+      />
     </div>
   );
 }
