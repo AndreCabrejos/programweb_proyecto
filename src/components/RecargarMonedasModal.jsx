@@ -1,10 +1,14 @@
-import React, { useState } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable"; // ✅ Import correcto
+import { useState } from "react";
 import "./RecargarMonedasModal.css";
 
-export default function RecargarMonedasModal({ monedas, setMonedas, onClose }) {
-  const [monto, setMonto] = useState("");
+// Importar las imágenes locales desde src/assets/
+import visa from "../assets/visa.svg";
+import master from "../assets/master.svg";
+import american from "../assets/american.svg";
+import diners from "../assets/diners.svg";
+
+export default function RecargarMonedasModal({ monedas, setMonedas, onClose, montoInicial = 0 }) {
+  const [monto, setMonto] = useState(montoInicial.toString());
   const [tarjeta, setTarjeta] = useState("");
   const [caducidad, setCaducidad] = useState("");
   const [cvv, setCvv] = useState("");
@@ -19,7 +23,6 @@ export default function RecargarMonedasModal({ monedas, setMonedas, onClose }) {
     }
 
     setCargando(true);
-
     setTimeout(() => {
       const id = "TXN" + Date.now();
       const nueva = {
@@ -30,157 +33,106 @@ export default function RecargarMonedasModal({ monedas, setMonedas, onClose }) {
       setTransaccion(nueva);
       setMonedas((prev) => prev + nueva.monto);
       setCargando(false);
-    }, 2000); // Simula una demora de 2 segundos
-  };
-
-  const generarComprobante = () => {
-    const doc = new jsPDF();
-    const fecha = new Date().toLocaleString();
-
-    // Encabezado
-    doc.setFontSize(18);
-    doc.text("Comprobante de Recarga", 60, 20);
-    doc.setFontSize(12);
-    doc.text(`ID Transacción: ${transaccion.id}`, 14, 35);
-    doc.text(`Fecha: ${fecha}`, 14, 42);
-
-    // Tabla con datos de la recarga
-    autoTable(doc, {
-      startY: 55,
-      head: [["Detalle", "Valor"]],
-      body: [
-        ["Monto Recargado", `S/. ${transaccion.monto.toFixed(2)}`],
-        ["Saldo Actual", `S/. ${(monedas + transaccion.monto).toFixed(2)}`],
-      ],
-      styles: { fontSize: 11 },
-      headStyles: { fillColor: [22, 160, 133], textColor: 255 },
-    });
-
-    // Mensaje de cierre
-    doc.text(
-      "Gracias por su recarga. ¡Siga disfrutando de nuestros servicios!",
-      14,
-      doc.lastAutoTable.finalY + 10
-    );
-
-    // Guardar archivo
-    doc.save(`comprobante_${transaccion.id}.pdf`);
+    }, 2000);
   };
 
   return (
     <div className="modal-overlay">
       <div className="payment-modal">
-        <button className="close-btn" onClick={onClose}>
-          ×
-        </button>
+        <button className="close-btn" onClick={onClose}>✖</button>
 
-        {cargando ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Procesando pago...</p>
-          </div>
-        ) : !transaccion ? (
+        {!transaccion ? (
           <>
-            <div className="payment-header">
-              <h2>Comercia Global Payments</h2>
-            </div>
+            <div className="payment-header">Recargar Monedas</div>
 
             <div className="payment-body">
-              <div className="payment-amount">
-                <span>Importe:</span>
-                <input
-                  type="number"
-                  placeholder="Monto (Soles S/)"
-                  value={monto}
-                  onChange={(e) => setMonto(e.target.value)}
-                />
-              </div>
+              {cargando ? (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <p>Procesando pago...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="payment-amount">
+                    <span>Monto a recargar:</span>
+                    <input
+                      type="number"
+                      value={monto}
+                      onChange={(e) => setMonto(e.target.value)}
+                      placeholder="Ingrese monto"
+                      required
+                    />
+                  </div>
 
-              <h3>PAGAR CON TARJETA</h3>
-
-              <form className="payment-form" onSubmit={simularPago}>
-                <label>
-                  Nº Tarjeta
-                  <input
-                    type="text"
-                    placeholder="•••• •••• •••• ••••"
-                    maxLength="19"
-                    value={tarjeta}
-                    onChange={(e) => setTarjeta(e.target.value)}
-                  />
-                </label>
-
-                <div className="form-row">
-                  <label>
-                    Caducidad
+                  <h3>Datos de la Tarjeta</h3>
+                  <form onSubmit={simularPago} className="payment-form">
+                    <label>Número de tarjeta</label>
                     <input
                       type="text"
-                      placeholder="MM/AA"
-                      maxLength="5"
-                      value={caducidad}
-                      onChange={(e) => setCaducidad(e.target.value)}
+                      value={tarjeta}
+                      onChange={(e) => setTarjeta(e.target.value)}
+                      placeholder="XXXX XXXX XXXX XXXX"
+                      maxLength={19}
+                      required
                     />
-                  </label>
-                  <label>
-                    Cód. Seguridad
-                    <input
-                      type="text"
-                      placeholder="CVV"
-                      maxLength="3"
-                      value={cvv}
-                      onChange={(e) => setCvv(e.target.value)}
-                    />
-                  </label>
-                </div>
 
-                <div className="button-row">
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={onClose}
-                  >
-                    CANCELAR
-                  </button>
-                  <button type="submit" className="pay-btn">
-                    PAGAR
-                  </button>
-                </div>
-              </form>
+                    <div className="form-row">
+                      <div>
+                        <label>Caducidad</label>
+                        <input
+                          type="text"
+                          value={caducidad}
+                          onChange={(e) => setCaducidad(e.target.value)}
+                          placeholder="MM/AA"
+                          maxLength={5}
+                          required
+                        />
+                      </div>
 
-              <div className="payment-footer">
-                <div className="logo-container">
-                  <img src="src/assets/visa.svg" alt="Visa" />
-                </div>
-                <div className="logo-container">
-                  <img src="src/assets/master.svg" alt="Mastercard" />
-                </div>
-                <div className="logo-container">
-                  <img src="src/assets/american.svg" alt="American Express" />
-                </div>
-                <div className="logo-container">
-                  <img src="src/assets/diners.svg" alt="Diners Club" />
-                </div>
-              </div>
+                      <div>
+                        <label>CVV</label>
+                        <input
+                          type="password"
+                          value={cvv}
+                          onChange={(e) => setCvv(e.target.value)}
+                          placeholder="XXX"
+                          maxLength={3}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="button-row">
+                      <button type="button" className="cancel-btn" onClick={onClose}>
+                        Cancelar
+                      </button>
+                      <button type="submit" className="pay-btn">
+                        Confirmar Pago
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+            </div>
+
+            <div className="payment-footer">
+              <img src={visa} alt="Visa" />
+              <img src={master} alt="MasterCard" />
+              <img src={american} alt="American Express" />
+              <img src={diners} alt="Diners Club" />
             </div>
           </>
         ) : (
           <div className="recargar-result">
-            <h3>¡Recarga Exitosa!</h3>
-            <p>
-              <strong>ID:</strong> {transaccion.id}
-            </p>
-            <p>
-              <strong>Monto:</strong> S/. {transaccion.monto}
-            </p>
-            <p>
-              <strong>Fecha:</strong> {transaccion.fecha}
-            </p>
-            <button className="pay-btn" onClick={generarComprobante}>
-              Descargar Comprobante (PDF)
-            </button>
+            <h3>✅ Recarga Exitosa</h3>
+            <p><strong>ID de transacción:</strong> {transaccion.id}</p>
+            <p><strong>Monto:</strong> {transaccion.monto} monedas</p>
+            <p><strong>Fecha:</strong> {transaccion.fecha}</p>
+            <button className="pay-btn" onClick={onClose}>Cerrar</button>
           </div>
         )}
       </div>
     </div>
   );
 }
+
