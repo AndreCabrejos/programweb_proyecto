@@ -1,56 +1,96 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
-
-// Definición de niveles
-const niveles = [
-  { nivel: 1, xp_min: 0 },
-  { nivel: 2, xp_min: 100 },
-  { nivel: 3, xp_min: 300 },
-  { nivel: 4, xp_min: 600 },
-  { nivel: 5, xp_min: 1000 },
-  { nivel: 6, xp_min: 1500 },
-  { nivel: 7, xp_min: 2100 },
-];
+import viewerLevelsData from "../data/viewerLevels.json";
 
 export default function Header({
   isLoggedIn,
   userRole,
   onLoginClick,
   onLogoutClick,
-  onRecargarClick,
   monedas,
-  puntos = 1200,
+  currentUserEmail,
+  currentUserName,
 }) {
   const [perfilVisible, setPerfilVisible] = useState(false);
+  const [viewerStats, setViewerStats] = useState({
+    nivel: 1,
+    puntos: 0,
+  });
+
   const navigate = useNavigate();
 
-  // Calcular nivel actual
-  let nivelActual = niveles[0];
-  let siguienteNivel = null;
+  const statsKey = currentUserEmail
+    ? `viewerStats_${currentUserEmail}`
+    : "viewerStats";
 
-  for (let i = 0; i < niveles.length; i++) {
-    if (puntos >= niveles[i].xp_min) {
-      nivelActual = niveles[i];
-      siguienteNivel = niveles[i + 1] || null;
+  // Nombre que se mostrará en el modal de perfil
+  const nombreMostrar = currentUserName || currentUserEmail || "Viewer";
+
+  // Cuando se abre el modal, leemos los stats actuales del viewer
+  const abrirPerfil = () => {
+    if (userRole === "viewer") {
+      try {
+        const saved = localStorage.getItem(statsKey);
+        const stats = saved ? JSON.parse(saved) : { nivel: 1, puntos: 0 };
+        setViewerStats(stats);
+      } catch {
+        setViewerStats({ nivel: 1, puntos: 0 });
+      }
+    }
+    setPerfilVisible(true);
+  };
+
+  // ----- Cálculo de nivel y barra SOLO para viewer -----
+  let nivelMostrar = 1;
+  let puntosMostrar = 0;
+  let porcentaje = 0;
+  let puntosFaltantes = 0;
+  let siguienteNivelNumero = null;
+
+  if (userRole === "viewer") {
+    const nivelActual =
+      viewerStats.nivel && viewerStats.nivel > 0 ? viewerStats.nivel : 1;
+    const puntosActuales = viewerStats.puntos || 0;
+
+    const registroActual =
+      viewerLevelsData.find((l) => l.nivel === nivelActual) ||
+      viewerLevelsData[0];
+
+    const registroSiguiente = viewerLevelsData.find(
+      (l) => l.nivel === nivelActual + 1
+    );
+
+    nivelMostrar = registroActual.nivel;
+    puntosMostrar = puntosActuales;
+
+    if (registroSiguiente) {
+      const base = registroActual.puntos_requeridos; // puntos al inicio de este nivel
+      const objetivo = registroSiguiente.puntos_requeridos; // puntos para el sig. nivel
+      const rango = Math.max(objetivo - base, 1);
+      const progresoNivel = Math.max(puntosActuales - base, 0);
+
+      porcentaje = Math.min((progresoNivel / rango) * 100, 100);
+      puntosFaltantes = Math.max(objetivo - puntosActuales, 0);
+      siguienteNivelNumero = registroSiguiente.nivel;
     } else {
-      break;
+      // No hay siguiente nivel: estás al máximo
+      porcentaje = 100;
+      puntosFaltantes = 0;
+      siguienteNivelNumero = null;
     }
   }
 
-  const xpDesdeNivelActual = puntos - nivelActual.xp_min;
-  const tramoNivel = siguienteNivel
-    ? siguienteNivel.xp_min - nivelActual.xp_min
-    : 1;
-  const porcentaje = siguienteNivel
-    ? Math.min((xpDesdeNivelActual / tramoNivel) * 100, 100)
-    : 100;
-
-  const puntosFaltantes = siguienteNivel ? siguienteNivel.xp_min - puntos : 0;
-
   return (
     <header className="main-header">
-      <h1 className="logo">🎥 Streamoria</h1>
+      {/* Logo que lleva al home */}
+      <h1
+        className="logo"
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate("/")}
+      >
+        🎥 Streamoria
+      </h1>
 
       <nav className="nav-links-right">
         <Link to="/">Inicio</Link>
@@ -68,10 +108,7 @@ export default function Header({
             </button>
 
             {/* Botón perfil */}
-            <button
-              className="btn-perfil"
-              onClick={() => setPerfilVisible(true)}
-            >
+            <button className="btn-perfil" onClick={abrirPerfil}>
               👤
             </button>
           </>
@@ -80,65 +117,91 @@ export default function Header({
             Iniciar sesión
           </button>
         )}
-
-        {/* Si el usuario es viewer → botón recargar */}
-        {isLoggedIn && userRole === "viewer" && (
-          <button className="btn-recargar" onClick={onRecargarClick}>
-            Recargar
-          </button>
-        )}
       </nav>
 
       {/* MODAL DE PERFIL */}
       {perfilVisible && (
         <div className="perfil-modal">
           <div className="perfil-contenido">
-            <h3>Mi Perfil</h3>
-            <p>
-              <strong>Nivel:</strong> {nivelActual.nivel}
-            </p>
-            <p>
-              <strong>Puntos:</strong> {puntos}
-            </p>
-
-            {siguienteNivel ? (
-              <p className="texto-avance">
-                Te faltan <strong>{puntosFaltantes}</strong> puntos para el
-                nivel <strong>{siguienteNivel.nivel}</strong>.
-              </p>
-            ) : (
-              <p className="texto-avance">¡Has alcanzado el nivel máximo!</p>
-            )}
-
-            <div className="barra-progreso">
-              <div
-                className="progreso"
-                style={{ width: `${porcentaje}%` }}
-              ></div>
-            </div>
-
-            <p className="texto-progreso">
-              Progreso hacia el siguiente nivel: {porcentaje.toFixed(1)}%
-            </p>
-
-            {/* Botón cerrar sesión dentro del modal */}
-            <button
-              className="cerrar-perfil"
-              onClick={() => {
-                setPerfilVisible(false);
-                onLogoutClick();
-              }}
-            >
-              Cerrar sesión
-            </button>
-
-            {/* Botón para cerrar solo el modal */}
+            {/* X arriba a la derecha */}
             <button
               className="cerrar-modal"
               onClick={() => setPerfilVisible(false)}
             >
               ✖
             </button>
+
+            <h3>Perfil de {nombreMostrar}</h3>
+
+            {userRole === "viewer" ? (
+              <>
+                <p>
+                  <strong>Nivel:</strong> {nivelMostrar}
+                </p>
+                <p>
+                  <strong>Puntos:</strong> {puntosMostrar}
+                </p>
+
+                {siguienteNivelNumero ? (
+                  <p className="texto-avance">
+                    Te faltan <strong>{puntosFaltantes}</strong> puntos para el
+                    nivel <strong>{siguienteNivelNumero}</strong>.
+                  </p>
+                ) : (
+                  <p className="texto-avance">
+                    ¡Has alcanzado el nivel máximo configurado!
+                  </p>
+                )}
+
+                <div className="barra-progreso">
+                  <div
+                    className="progreso"
+                    style={{ width: `${porcentaje}%` }}
+                  ></div>
+                </div>
+
+                <p className="texto-progreso">
+                  Progreso hacia el siguiente nivel: {porcentaje.toFixed(1)}%
+                </p>
+
+                {/* Cerrar sesión (viewer) */}
+                <button
+                  className="cerrar-perfil"
+                  onClick={() => {
+                    setPerfilVisible(false);
+                    onLogoutClick();
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <>
+                <p>Estás logueado como streamer.</p>
+
+                <div className="perfil-botones-streamer">
+                  <button
+                    className="btn-ir-panel"
+                    onClick={() => {
+                      setPerfilVisible(false);
+                      navigate("/streamer");
+                    }}
+                  >
+                    Ir al panel de streamer
+                  </button>
+
+                  <button
+                    className="cerrar-perfil"
+                    onClick={() => {
+                      setPerfilVisible(false);
+                      onLogoutClick();
+                    }}
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

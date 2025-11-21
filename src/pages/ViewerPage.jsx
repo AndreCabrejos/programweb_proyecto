@@ -1,4 +1,4 @@
-
+// src/pages/ViewerPage.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CanalesRecomendados from "../components/CanalesRecomendados";
@@ -6,90 +6,87 @@ import Regalos from "../components/Regalos";
 import Notificacion from "../components/Notificacion";
 import mensajesData from "../data/mensajes.json";
 import canalesData from "../data/canales.json";
+import viewerLevelsData from "../data/viewerLevels.json";
 import "./ViewerPage.css";
 
+export default function ViewerPage({
+  monedas,
+  setMonedas,
+  currentUserEmail,
+  currentUserName,
+}) {
+  // clave para guardar stats por usuario
+  const statsKey = currentUserEmail
+    ? `viewerStats_${currentUserEmail}`
+    : "viewerStats";
 
-const ViewerProfileCard = ({ coins }) => {
-  const [viewerData, setViewerData] = useState({
-    nombre: "André",
-    nivel: 5,
-    puntos: 1240,
+  const { canal } = useParams();
+
+  // nombre que se muestra en el chat
+  const displayName = currentUserName || "Tú";
+
+  const [nivel, setNivel] = useState(() => {
+    try {
+      const saved = localStorage.getItem(statsKey);
+      if (!saved) return 1;
+      const parsed = JSON.parse(saved);
+      return parsed.nivel || 1;
+    } catch {
+      return 1;
+    }
   });
 
-  // Simulación de ganancia de puntos en tiempo real
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setViewerData((prev) => ({
-        ...prev,
-        puntos: prev.puntos + Math.floor(Math.random() * 10),
-      }));
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
+  const [puntos, setPuntos] = useState(() => {
+    try {
+      const saved = localStorage.getItem(statsKey);
+      if (!saved) return 0;
+      const parsed = JSON.parse(saved);
+      return parsed.puntos || 0;
+    } catch {
+      return 0;
+    }
+  });
 
-  // Cálculo del progreso al siguiente nivel (cada 1000 puntos)
-  const progreso = (viewerData.puntos % 1000) / 10;
+  const [showNotif, setShowNotif] = useState(false);
+  const [mensajeNotif, setMensajeNotif] = useState("");
 
-  return (
-    <div className="profile-card">
-      <div className="profile-header">
-        <div className="profile-icon" style={{ fontSize: "60px" }}>👤</div>
-        <h2 className="profile-title">Perfil de {viewerData.nombre}</h2>
-      </div>
-
-      {/* Sección de Progreso y Datos del Perfil (Tu Avance) */}
-      <div className="progress-section mb-1">
-        <div className="info-row">
-          <span className="icon">⭐</span>
-          <span className="label">Nivel:</span>
-          <strong className="value">{viewerData.nivel}</strong>
-        </div>
-
-        <div className="info-row">
-          <span className="icon">🏆</span>
-          <span className="label">Puntos:</span>
-          <strong className="value">{viewerData.puntos}</strong>
-        </div>
-
-        {/* Saldo de Monedas (Usamos el prop 'coins' de App.jsx) */}
-        <div className="info-row coin-row">
-          <span className="icon">🪙</span>
-          <span className="label">Saldo Actual:</span>
-          <strong className="value coin-value">{coins}</strong>
-        </div>
-
-
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${progreso}%` }}></div>
-        </div>
-        <p className="progress-text">
-          Progreso al siguiente nivel: {progreso.toFixed(1)}%
-        </p>
-      </div>
-    </div>
-  );
-};
-
-
-// Componente principal que fusiona el Stream con el Chat/Sidebar
-export default function ViewerPage({ monedas, setMonedas }) {
-    const [nivel, setNivel] = useState(1); // Nivel del usuario
-  const [showNotif, setShowNotif] = useState(false); // Mostrar o no la notificación
-  const { canal } = useParams();
   const [canalSeleccionado, setCanalSeleccionado] = useState(() => {
     return (
       canalesData.find(
         (c) => c.nombre.toLowerCase() === canal.toLowerCase()
-      ) || canalesData[0] // fallback si no encuentra
+      ) || canalesData[0]
     );
   });
+
   const [mostrarRegalos, setMostrarRegalos] = useState(false);
   const [mensaje, setMensaje] = useState("");
-  const [puntos, setPuntos] = useState(0);
   const [mensajes, setMensajes] = useState(mensajesData);
-  const [mensajeNotif, setMensajeNotif] = useState("");
   const mensajesRef = useRef(null);
 
+  const [viewerLevels] = useState(() => {
+    const saved = localStorage.getItem("viewerLevels");
+    return saved ? JSON.parse(saved) : viewerLevelsData;
+  });
+
+  // recargar stats cuando cambia de usuario
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(statsKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setNivel(parsed.nivel || 1);
+        setPuntos(parsed.puntos || 0);
+      } else {
+        setNivel(1);
+        setPuntos(0);
+      }
+    } catch {
+      setNivel(1);
+      setPuntos(0);
+    }
+  }, [statsKey]);
+
+  // actualizar canal por URL
   useEffect(() => {
     const encontrado = canalesData.find(
       (c) => c.nombre.toLowerCase() === canal.toLowerCase()
@@ -97,86 +94,122 @@ export default function ViewerPage({ monedas, setMonedas }) {
     if (encontrado) setCanalSeleccionado(encontrado);
   }, [canal]);
 
-  // 🔹 Desplazar automáticamente hacia el final
+  // scroll automático del chat
   useEffect(() => {
     if (mensajesRef.current) {
       mensajesRef.current.scrollTop = mensajesRef.current.scrollHeight;
     }
   }, [mensajes]);
 
+  // lógica de subida de nivel
   useEffect(() => {
-  const puntosNecesarios = nivel * 30;
-  if (puntos >= puntosNecesarios) {
-    const nuevoNivel = nivel + 1;
-    setNivel(nuevoNivel);
-    setMensajeNotif(`🎉 ¡Has subido al nivel ${nuevoNivel}!`);
-    setShowNotif(true);
+    const nextConfig = viewerLevels.find((l) => l.nivel === nivel + 1);
+    if (!nextConfig) return;
+    const puntosNecesarios = nextConfig.puntos_requeridos;
 
-    // 🔹 Reinicia los puntos sobrantes en el nuevo nivel
-    setPuntos((prev) => prev - puntosNecesarios);
-  }
-}, [puntos, nivel]);
+    if (puntos >= puntosNecesarios) {
+      const nuevoNivel = nivel + 1;
+      setNivel(nuevoNivel);
+      setMensajeNotif(`🎉 ¡Has subido al nivel ${nuevoNivel}!`);
+      setShowNotif(true);
+    }
+  }, [puntos, nivel, viewerLevels]);
 
-
+  // auto-ocultar notificación
   useEffect(() => {
-  if (showNotif) {
-    const timer = setTimeout(() => setShowNotif(false), 8000);
+    if (!showNotif) return;
+    const timer = setTimeout(() => setShowNotif(false), 3000);
     return () => clearTimeout(timer);
-  }
-}, [showNotif]);
+  }, [showNotif]);
 
+  // guardar stats y avisar (Header / otros)
+  useEffect(() => {
+    const payload = { nivel, puntos, email: currentUserEmail || null };
+    localStorage.setItem(statsKey, JSON.stringify(payload));
 
+    window.dispatchEvent(
+      new CustomEvent("viewerStatsUpdated", { detail: payload })
+    );
+  }, [nivel, puntos, statsKey, currentUserEmail]);
+
+  // enviar regalo: resta monedas, suma puntos y avisa al streamer
   const handleEnviarRegalo = (regalo) => {
     setMonedas((prev) => prev - regalo.costo);
     setPuntos((prev) => prev + (regalo.puntos || 0));
+
+    window.dispatchEvent(
+      new CustomEvent("streamGift", {
+        detail: {
+          canal: canalSeleccionado.nombre,
+          user: displayName,
+          regalo,
+        },
+      })
+    );
   };
 
+  // enviar mensaje: +1 punto y evento para vista del streamer
   const handleEnviarMensaje = (e) => {
     e.preventDefault();
-    if (mensaje.trim() !== "") {
-      const nuevoMensaje = {
-        id: mensajes.length + 1,
-        usuario: "Tú",
-        texto: mensaje,
-      };
-      setMensajes([...mensajes, nuevoMensaje]);
-      setMensaje("");
-      setPuntos((prev) => prev + 1); // +1 punto por mensaje
-    }
+    if (!mensaje.trim()) return;
+
+    const nuevoMensaje = {
+      id: mensajes.length + 1,
+      usuario: displayName,
+      texto: mensaje,
+      nivel,
+    };
+
+    setMensajes((prev) => [...prev, nuevoMensaje]);
+    setMensaje("");
+    setPuntos((prev) => prev + 1);
+
+    window.dispatchEvent(
+      new CustomEvent("streamChatMessage", {
+        detail: {
+          canal: canalSeleccionado.nombre,
+          user: displayName,
+          nivel,
+          texto: mensaje,
+        },
+      })
+    );
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleEnviarMensaje(e);
-
     }
   };
 
-  useEffect(() => {
-    if (showNotif) {
-      const timer = setTimeout(() => setShowNotif(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showNotif]);
-  
-    
+  const formatNumber = (n) => n.toLocaleString("es-ES");
+
+  const nextConfig = viewerLevels.find((l) => l.nivel === nivel + 1);
+  const puntosFaltantes = nextConfig
+    ? Math.max(nextConfig.puntos_requeridos - puntos, 0)
+    : null;
+
+  const progresoMiniBarra = nextConfig
+    ? Math.min((puntos / nextConfig.puntos_requeridos) * 100, 100)
+    : 100;
 
   return (
-
     <div className="viewer-layout">
       <aside className="viewer-canales">
-        <CanalesRecomendados />
+        {/* Aquí sabemos que ya es viewer logueado */}
+        <CanalesRecomendados isLoggedIn={true} userRole="viewer" />
       </aside>
 
       <main className="viewer-stream">
         <div className="stream-video">
           🎥 Transmisión en vivo de <strong>{canalSeleccionado.nombre}</strong>
         </div>
+
         <div className="stream-info">
           <div className="stream-left">
             <img
-              src={canalSeleccionado.imagen}            // <-- usa la propiedad imagen del JSON
+              src={canalSeleccionado.imagen}
               alt={canalSeleccionado.nombre}
               className="stream-logo"
             />
@@ -184,7 +217,9 @@ export default function ViewerPage({ monedas, setMonedas }) {
               <h2 className="stream-name">
                 {canalSeleccionado.nombre} <span className="verified">✅</span>
               </h2>
-              <p className="stream-category">{canalSeleccionado.categoria}</p>
+              <p className="stream-category">
+                {canalSeleccionado.categoria}
+              </p>
             </div>
           </div>
 
@@ -198,10 +233,10 @@ export default function ViewerPage({ monedas, setMonedas }) {
               <span className="label-espectadores">Espectadores</span>
             </div>
           </div>
-          <p className="nivel-actual">⭐ Nivel actual: {nivel}</p>
         </div>
-      </main >
+      </main>
 
+      {/* CHAT */}
       <aside className="viewer-chat">
         <div className="chat-box">
           <div className="chat-mensajes" ref={mensajesRef}>
@@ -228,9 +263,33 @@ export default function ViewerPage({ monedas, setMonedas }) {
 
         <div className="chat-footer">
           <div className="puntos">
-            <img src="/images/puntos.png" alt="puntos" className="icono-puntos" />
-            <span>{puntos}</span>
+            {/* Fila: icono + número */}
+            <div className="puntos-row">
+              <img
+                src="/images/puntos.png"
+                alt="puntos"
+                className="icono-puntos"
+              />
+              <span className="puntos-valor">{formatNumber(puntos)}</span>
+            </div>
+
+            {/* Barra + texto debajo */}
+            {nextConfig && (
+              <>
+                <div className="mini-barra-progreso">
+                  <div
+                    className="mini-barra-fill"
+                    style={{ width: `${progresoMiniBarra}%` }}
+                  ></div>
+                </div>
+                <span className="mini-texto-nivel">
+                  Te faltan {formatNumber(puntosFaltantes)} pts para el nivel{" "}
+                  {nextConfig.nivel}
+                </span>
+              </>
+            )}
           </div>
+
           <button
             className="btn-tienda"
             onClick={() => setMostrarRegalos(!mostrarRegalos)}
@@ -239,6 +298,7 @@ export default function ViewerPage({ monedas, setMonedas }) {
           </button>
         </div>
 
+
         {mostrarRegalos && (
           <Regalos
             monedas={monedas}
@@ -246,24 +306,13 @@ export default function ViewerPage({ monedas, setMonedas }) {
             onClose={() => setMostrarRegalos(false)}
           />
         )}
-
       </aside>
-      {/* Notificación solo aparece cuando showNotif es true */}
+
       <Notificacion
         message={mensajeNotif}
         show={showNotif}
         onClose={() => setShowNotif(false)}
       />
-
-      
-    </div >
-    
-    
-    
-
-
-    
-
-    
+    </div>
   );
 }

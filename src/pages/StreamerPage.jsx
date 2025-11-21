@@ -11,15 +11,23 @@ import { FaInfoCircle, FaPlayCircle, FaCogs, FaGift } from 'react-icons/fa';
 export default function StreamerPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamStartTime, setStreamStartTime] = useState(null);
-  const [streamerInfo, setStreamerInfo] = useState(streamerData);
+  const [streamerInfo, setStreamerInfo] = useState(() => {
+    const saved = localStorage.getItem("streamerInfo");
+    return saved ? JSON.parse(saved) : streamerData;
+  });
+
   const [levelUpNotice, setLevelUpNotice] = useState(false);
-  const [viewerLevels, setViewerLevels] = useState(initialViewerLevels);
+  const [viewerLevels, setViewerLevels] = useState(() => {
+    const saved = localStorage.getItem("viewerLevels");
+    return saved ? JSON.parse(saved) : initialViewerLevels;
+  });
+
   const [showGiftOverlay, setShowGiftOverlay] = useState(false);
   const [giftData, setGiftData] = useState(null);
 
   useEffect(() => {
     let interval;
-    if (isStreaming) {
+    if (isStreaming && streamStartTime) {
       interval = setInterval(() => {
         const now = new Date();
         const elapsedSeconds = (now - streamStartTime) / 1000;
@@ -42,7 +50,12 @@ export default function StreamerPage() {
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isStreaming, streamStartTime]);
+  }, [isStreaming, streamStartTime, streamerInfo.horas_totales, streamerInfo.horas_para_subir]);
+
+  // Persistir info del streamer
+  useEffect(() => {
+    localStorage.setItem("streamerInfo", JSON.stringify(streamerInfo));
+  }, [streamerInfo]);
 
   const startStream = () => {
     setIsStreaming(true);
@@ -58,6 +71,7 @@ export default function StreamerPage() {
     const newLevels = [...viewerLevels];
     newLevels[index].puntos_requeridos = parseInt(value, 10);
     setViewerLevels(newLevels);
+    localStorage.setItem("viewerLevels", JSON.stringify(newLevels));
   };
 
   const getStreamDuration = () => {
@@ -66,9 +80,9 @@ export default function StreamerPage() {
     const hours = Math.floor(elapsedSeconds / 3600);
     const minutes = Math.floor((elapsedSeconds % 3600) / 60);
     const seconds = elapsedSeconds % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes
+    return `${hours.toString().padStart(2, "0")}:${minutes
       .toString()
-      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
   return (

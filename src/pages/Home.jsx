@@ -1,12 +1,15 @@
+// src/pages/Home.jsx
 import CanalesRecomendados from "../components/CanalesRecomendados";
 import "./Home.css";
 
-export default function Home() {
+export default function Home({ isLoggedIn, userRole }) {
   return (
-
     <div className="home-layout">
       <aside className="canales-sidebar">
-        <CanalesRecomendados />
+        <CanalesRecomendados
+          isLoggedIn={isLoggedIn}
+          userRole={userRole}
+        />
       </aside>
 
       <section className="home-content">
@@ -14,6 +17,5 @@ export default function Home() {
         <p>Explora canales en vivo y descubre nuevos creadores.</p>
       </section>
     </div>
-
   );
 }
