@@ -22,7 +22,8 @@
 
     display: flex;
     flex-direction: column;
-    align-items: stretch;   /* ✅ los elementos ocuparán todo el ancho */
+    align-items: stretch;
+    /* ✅ los elementos ocuparán todo el ancho */
     padding: 1.5rem;
 }
 
@@ -40,15 +41,17 @@
 }
 
 .stream-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;               /* que ocupe todo el ancho disponible */
-  background-color: #18181b;
-  padding: 14px 22px;
-  border-radius: 10px;
-  margin-top: 10px;
-  box-sizing: border-box;     /* para que el padding no rompa el ancho */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    /* que ocupe todo el ancho disponible */
+    background-color: #18181b;
+    padding: 14px 22px;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    /* para que el padding no rompa el ancho */
 }
 
 .stream-left {
@@ -103,42 +106,45 @@
 }
 
 .stream-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  justify-content: flex-end; /* ✅ los alinea totalmente a la derecha */
-  flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: flex-end;
+    /* ✅ los alinea totalmente a la derecha */
+    flex: 1;
 }
 
 .stream-viewers {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    font-size: 1rem;
 }
 
 .stream-viewers span {
-  color: #b0b0b0;           /* gris suave para la palabra "Espectadores" */
-  font-weight: 500;
-  font-size: 0.9rem;
+    color: #b0b0b0;
+    /* gris suave para la palabra "Espectadores" */
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
 .person-icon {
-  font-size: 1.1rem;
-  opacity: 0.85;
+    font-size: 1.1rem;
+    opacity: 0.85;
 }
 
 .num-viewers {
-  color: #ff4040 !important; /* 🔴 rojo fuerte */
-  font-weight: 800;
-  font-size: 1.15rem;
+    color: #ff4040 !important;
+    /* 🔴 rojo fuerte */
+    font-weight: 800;
+    font-size: 1.15rem;
 }
 
 .label-espectadores {
-  color: #a8a8a8;
-  font-weight: 500;
-  font-size: 0.95rem;
+    color: #a8a8a8;
+    font-weight: 500;
+    font-size: 0.95rem;
 }
 
 .btn-follow {
@@ -225,7 +231,6 @@
     background-color: #4a4a4a;
 }
 
-/* 💎 Footer inferior */
 .chat-footer {
     background-color: #202020;
     display: flex;
@@ -235,18 +240,55 @@
     border-top: 1px solid #2a2a2a;
 }
 
+/* Contenedor general de puntos (columna) */
 .puntos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    flex: 1;
+    /* ocupa el espacio para que la barra tenga ancho */
+}
+
+/* fila icono + número */
+.puntos-row {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-weight: bold;
-    color: #ffd700;
 }
 
 .icono-puntos {
     width: 22px;
     height: 22px;
 }
+
+.puntos-valor {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffd700;
+}
+
+/* mini barra de progreso debajo de la fila */
+.mini-barra-progreso {
+    width: 100%;
+    height: 6px;
+    background: #262626;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.mini-barra-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #a855f7, #22c55e);
+    border-radius: 999px;
+}
+
+/* texto "te faltan X pts..." alineado con la barra */
+.mini-texto-nivel {
+    font-size: 0.75rem;
+    color: #b3b3b3;
+}
+
 
 .btn-tienda {
     background-color: #2a2a2a;
@@ -262,6 +304,7 @@
 .btn-tienda:hover {
     background-color: #383838;
 }
+
 
 /* 🎁 Panel de regalos (overlay flotante) */
 .overlay-regalos {

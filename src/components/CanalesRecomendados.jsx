@@ -2,8 +2,16 @@ import { useNavigate } from "react-router-dom";
 import canalesData from "../data/canales.json";
 import "./CanalesRecomendados.css";
 
-export default function CanalesRecomendados() {
+export default function CanalesRecomendados({ isLoggedIn, userRole }) {
   const navigate = useNavigate();
+
+  const handleClickCanal = (nombreCanal) => {
+    if (!isLoggedIn || userRole !== "viewer") {
+      window.dispatchEvent(new Event("openLoginModal"));
+      return;
+    }
+    navigate(`/viewer/${nombreCanal}`);
+  };
 
   const formatViewers = (num) => {
     if (num >= 1000) return (num / 1000).toFixed(1) + " mil";
@@ -18,17 +26,18 @@ export default function CanalesRecomendados() {
           <div
             key={canal.id}
             className="canal-item"
-            onClick={() => navigate(`/viewer/${canal.nombre.toLowerCase()}`)}
+            onClick={() => handleClickCanal(canal.nombre.toLowerCase())}
           >
             <img src={canal.imagen} alt={canal.nombre} className="canal-logo" />
             <div className="canal-info">
               <p className="canal-nombre">{canal.nombre}</p>
               <p className="canal-categoria">{canal.categoria}</p>
             </div>
-
             <div className="canal-viewers">
               <span className="punto-rojo"></span>
-              <span className="numero-viewers">{formatViewers(canal.viewers)}</span>
+              <span className="numero-viewers">
+                {formatViewers(canal.viewers)}
+              </span>
             </div>
           </div>
         ))}

@@ -83,3 +83,22 @@
     font-size: 0.8rem;
     color: #fff;
 }
+
+/* CanalesRecomendados.css */
+.canal-item-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    padding: 6px 4px;
+    color: inherit;
+}
+
+.canal-item-btn:hover {
+    background-color: #262626;
+    border-radius: 6px;
+}

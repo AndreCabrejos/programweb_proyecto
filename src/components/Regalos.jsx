@@ -1,18 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import regalosData from "../data/regalos.json";
 import "./Regalos.css";
 
 export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
   const [regaloSeleccionado, setRegaloSeleccionado] = useState(null);
+  const [regalos, setRegalos] = useState(regalosData);
+  const [mensajeEnvio, setMensajeEnvio] = useState(""); // 👈 nuevo estado
+
+  useEffect(() => {
+    const guardados = localStorage.getItem("regalos");
+    if (guardados) {
+      setRegalos(JSON.parse(guardados));
+    }
+  }, []);
 
   const handleEnviar = () => {
-    if (!regaloSeleccionado) return alert("Selecciona un regalo primero.");
-    if (monedas < regaloSeleccionado.costo)
-      return alert("No tienes suficientes monedas.");
+    if (!regaloSeleccionado) {
+      setMensajeEnvio("Selecciona un regalo primero ✋");
+      setTimeout(() => setMensajeEnvio(""), 2000);
+      return;
+    }
+
+    if (monedas < regaloSeleccionado.costo) {
+      setMensajeEnvio("No tienes suficientes monedas 😢");
+      setTimeout(() => setMensajeEnvio(""), 2000);
+      return;
+    }
 
     onEnviarRegalo(regaloSeleccionado);
-    alert(`¡Has enviado ${regaloSeleccionado.nombre}! 🎁`);
+
+    // 👇 en vez de alert(), mostramos un mensajito dentro del panel
+    setMensajeEnvio(`¡Has enviado ${regaloSeleccionado.nombre}! 🎁`);
     setRegaloSeleccionado(null);
+
+    setTimeout(() => {
+      setMensajeEnvio("");
+    }, 2200);
   };
 
   return (
@@ -27,10 +50,11 @@ export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
         <p>Monedas disponibles: {monedas} 💰</p>
 
         <div className="lista-regalos">
-          {regalosData.map((r) => (
+          {regalos.map((r) => (
             <div
               key={r.id}
-              className={`regalo ${regaloSeleccionado?.id === r.id ? "seleccionado" : ""}`}
+              className={`regalo ${regaloSeleccionado?.id === r.id ? "seleccionado" : ""
+                }`}
               onClick={() => setRegaloSeleccionado(r)}
             >
               <span className="icono">{r.icono}</span>
@@ -40,6 +64,9 @@ export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
             </div>
           ))}
         </div>
+
+        {/* Mensaje de envío / error suave */}
+        {mensajeEnvio && <div className="regalo-toast">{mensajeEnvio}</div>}
 
         <button className="btn-enviar" onClick={handleEnviar}>
           Enviar regalo
