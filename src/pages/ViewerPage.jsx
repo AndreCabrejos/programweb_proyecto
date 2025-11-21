@@ -7,6 +7,7 @@ import Notificacion from "../components/Notificacion";
 import mensajesData from "../data/mensajes.json";
 import canalesData from "../data/canales.json";
 import viewerLevelsData from "../data/viewerLevels.json";
+import { emitGiftEvent } from "../services/streamEvents";
 import "./ViewerPage.css";
 
 export default function ViewerPage({
@@ -134,19 +135,18 @@ export default function ViewerPage({
 
   // enviar regalo: resta monedas, suma puntos y avisa al streamer
   const handleEnviarRegalo = (regalo) => {
+    // actualizar monedas y puntos en el cliente
     setMonedas((prev) => prev - regalo.costo);
     setPuntos((prev) => prev + (regalo.puntos || 0));
 
-    window.dispatchEvent(
-      new CustomEvent("streamGift", {
-        detail: {
-          canal: canalSeleccionado.nombre,
-          user: displayName,
-          regalo,
-        },
-      })
-    );
+    // 🔹 emitir evento de regalo (modo demo)
+    emitGiftEvent({
+      canal: canalSeleccionado.nombre,
+      user: displayName,
+      regalo,
+    });
   };
+
 
   // enviar mensaje: +1 punto y evento para vista del streamer
   const handleEnviarMensaje = (e) => {

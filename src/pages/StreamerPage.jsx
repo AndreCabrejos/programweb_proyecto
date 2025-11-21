@@ -6,6 +6,7 @@ import StreamerSidebar from '../components/StreamerSidebar';
 import StreamerRightSidebar from '../components/StreamerRightSidebar';
 import GiftManager from '../components/StreamerGifts';
 import GiftOverlay from '../components/GiftOverlay';
+import { emitGiftEvent, subscribeToGiftEvents } from "../services/streamEvents";
 import { FaInfoCircle, FaPlayCircle, FaCogs, FaGift } from 'react-icons/fa';
 
 export default function StreamerPage() {
@@ -24,6 +25,8 @@ export default function StreamerPage() {
 
   const [showGiftOverlay, setShowGiftOverlay] = useState(false);
   const [giftData, setGiftData] = useState(null);
+  const [viewerName, setViewerName] = useState("Espectador");
+
 
   useEffect(() => {
     let interval;
@@ -56,6 +59,28 @@ export default function StreamerPage() {
   useEffect(() => {
     localStorage.setItem("streamerInfo", JSON.stringify(streamerInfo));
   }, [streamerInfo]);
+
+  // Escuchar regalos enviados desde la vista de viewer (modo demo frontend)
+  useEffect(() => {
+    const unsubscribe = subscribeToGiftEvents((payload) => {
+      // payload: { canal, user, regalo }
+
+      // podrías filtrar por canal si luego tienes múltiples canales
+      setShowGiftOverlay(false);
+      setGiftData(null);
+
+      setTimeout(() => {
+        setViewerName(payload.user || "Espectador");
+        setGiftData(payload.regalo || null);
+        setShowGiftOverlay(true);
+      }, 50);
+    });
+
+    return () => {
+      // limpiar listener al desmontar
+      unsubscribe && unsubscribe();
+    };
+  }, []);
 
   const startStream = () => {
     setIsStreaming(true);
@@ -147,12 +172,11 @@ export default function StreamerPage() {
                   <button
                     className="stream-button simulate-gift-btn"
                     onClick={() => {
-                      setShowGiftOverlay(false);
-                      setGiftData(null);
-                      setTimeout(() => {
-                        setGiftData({ nombre: "Super Corazón 💖", costo: 100, puntos: 50 });
-                        setShowGiftOverlay(true);
-                      }, 50);
+                      emitGiftEvent({
+                        canal: "CanalDemo",
+                        user: "DemoViewer",
+                        regalo: { nombre: "Super Corazón 💖", costo: 100, puntos: 50 },
+                      });
                     }}
                   >
                     🎁 Simular Regalo
@@ -202,7 +226,7 @@ export default function StreamerPage() {
       <GiftOverlay
         show={showGiftOverlay}
         regalo={giftData}
-        espectador="André"
+        espectador={viewerName}
         onClose={() => setShowGiftOverlay(false)}
       />
     </div>
